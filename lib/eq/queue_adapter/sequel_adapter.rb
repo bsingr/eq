@@ -19,6 +19,7 @@ module EQ::QueueAdapter
       db[:jobs].insert :payload => payload.to_sequel_blob
     end
 
+    # TODO this must be a lock & delete, not a pop!!
     def pop
       db.transaction do
         job = db[:jobs].order(:id.desc).limit(1).first
