@@ -33,7 +33,7 @@ module EQ::Queueing
 
     def reserve
       if serialized_job = queue.reserve
-        job_id, *serialized_payload = *serialized_job
+        job_id, serialized_payload = *serialized_job
         job = EQ::Job.load job_id, serialized_payload
         debug "dequeud #{job.inspect}"
         job

@@ -2,7 +2,7 @@ module EQ
   class Job < Struct.new(:id, :serialized_payload)
     class << self
       def dump *unserialized_payload
-        Marshal.dump(unserialized_payload)
+        Marshal.dump(unserialized_payload.flatten)
       end
 
       def load id, serialized_payload
@@ -16,7 +16,7 @@ module EQ
     end
 
     def perform
-      const, *payload = *unpack
+      const, *payload = unpack
       const.perform *payload
     end
   end

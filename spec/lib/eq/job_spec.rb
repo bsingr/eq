@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe EQ::Job do |variable|
   it 'dumps const and payload' do
-    payload = EQ::Job.dump(EQ, 'bar', 'baz')
+    payload = EQ::Job.dump([EQ, 'bar', 'baz'])
     Marshal.load(payload).should == [EQ, 'bar', 'baz']
   end
 

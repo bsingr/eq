@@ -1,12 +1,13 @@
 shared_examples_for 'queue backend' do
   it 'pushes and pops' do
-    subject.push Marshal.dump ['foo','bar']
-    job_id, serialized_payload = *subject.reserve
-    Marshal.load(serialized_payload).should == ['foo', 'bar']
+    subject.push "foo"
+    job_id, payload = *subject.reserve
+    job_id.should == 1
+    payload.should == "foo"
   end
 end
 
-shared_examples_for 'queue' do
+shared_examples_for 'abstract queue' do
   it 'pushes jobs' do
     subject.waiting_count.should == 0
     subject.working_count.should == 0
