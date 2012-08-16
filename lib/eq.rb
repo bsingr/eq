@@ -1,35 +1,27 @@
-require File.join(File.dirname(__FILE__), 'eq', 'version')
-require File.join(File.dirname(__FILE__), 'eq', 'job')
-require File.join(File.dirname(__FILE__), 'eq', 'queue_adapter')
-require File.join(File.dirname(__FILE__), 'eq', 'queue_adapter', 'sequel_adapter')
 require 'celluloid'
+require File.join(File.dirname(__FILE__), 'eq', 'version')
+require File.join(File.dirname(__FILE__), 'eq', 'logging')
+require File.join(File.dirname(__FILE__), 'eq', 'job')
+require File.join(File.dirname(__FILE__), 'eq', 'queue')
+require File.join(File.dirname(__FILE__), 'eq', 'queue_adapter')
+require File.join(File.dirname(__FILE__), 'eq', 'worker')
+require File.join(File.dirname(__FILE__), 'eq', 'manager')
 
 module EQ
-  class Queue
-    include Celluloid
-  
-    def initialize
-      @queue = EQ::QueueAdapter::SequelAdapter.new
-    end
+  def self.boot
+    start_queue
+  end
 
-    def push *work
-      queue.push Job.dump(*work)
-    end
-
-    def pop
-      if payload = queue.pop
-        Job.load payload
-      end
-    end
-
-  private
-
-    def queue; @queue; end
-
+  def self.start_queue
+    EQ::Queue.supervise_as :queue, EQ::QueueAdapter::SequelAdapter.new
   end
 
   def self.queue
-    @queue ||= Queue.new
+    Celluloid::Actor[:queue]
+  end
+
+  def self.logger
+    Celluloid.logger
   end
 end
 
