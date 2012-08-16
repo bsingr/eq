@@ -4,6 +4,9 @@
 
 EQ is a little framework to queue tasks between threads in a persistent way.
 
+[![Travis-CI Build Status](https://secure.travis-ci.org/dpree/eq.png)](https://secure.travis-ci.org/dpree/eq)
+[![Code Climate](https://codeclimate.com/badge.png)](https://codeclimate.com/github/dpree/eq)
+
 ## Installation
 
 Add this line to your application's Gemfile:
