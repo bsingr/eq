@@ -1,3 +1,5 @@
+# EXPERIMENTAL FOO, HAVE ABSOLUTELY NO IDEA WHAT I AM DOING HERE...
+
 # EQ - Embedded Queueing
 
 EQ is a little framework to queue tasks between threads in a persistent way.
