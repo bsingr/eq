@@ -1,19 +1,22 @@
-module EQ
+module EQ::Queueing
   class Queue
     include Celluloid
-    include Logging
+    include EQ::Logging
   
     def initialize queue_adapter
       @queue = queue_adapter
     end
 
     def push *work
-      queue.push Job.dump(*work)
+      debug "enqueing #{work.inspect} ..."
+      queue.push EQ::Job.dump(*work)
     end
 
     def pop
       if payload = queue.pop
-        Job.load payload
+        job = EQ::Job.load payload
+        debug "dequeud #{job.inspect}"
+        job
       end
     end
 

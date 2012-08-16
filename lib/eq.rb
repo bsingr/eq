@@ -1,28 +1,37 @@
 require 'celluloid'
+
 require File.join(File.dirname(__FILE__), 'eq', 'version')
 require File.join(File.dirname(__FILE__), 'eq', 'logging')
 require File.join(File.dirname(__FILE__), 'eq', 'job')
-require File.join(File.dirname(__FILE__), 'eq', 'queue')
-require File.join(File.dirname(__FILE__), 'eq', 'queue_adapter')
-require File.join(File.dirname(__FILE__), 'eq', 'worker')
-require File.join(File.dirname(__FILE__), 'eq', 'manager')
 
 module EQ
-  def self.boot
-    start_queue
+  module_function
+
+  # this boots queuing and working
+  # optional: to use another queuing or working subsystem just do
+  # require 'eq/working' or require 'eq/queueing' instead of require 'eq/all'
+  def boot
+    boot_queueing if defined? EQ::Queueing
+    boot_working if defined? EQ::Working
   end
 
-  def self.start_queue
-    EQ::Queue.supervise_as :queue, EQ::QueueAdapter::SequelAdapter.new
+  def boot_queueing
+    EQ::Queueing.boot
   end
 
-  def self.queue
-    Celluloid::Actor[:queue]
+  def boot_working
+    EQ::Working.boot
   end
 
-  def self.logger
+  def queue
+    EQ::Queueing.queue
+  end
+
+  def worker
+    EQ::Working.worker
+  end
+
+  def logger
     Celluloid.logger
   end
 end
-
-

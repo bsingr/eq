@@ -1,4 +1,4 @@
-module EQ
+module EQ::Working
   class Manager
     include Celluloid
     include EQ::Logging
@@ -8,10 +8,11 @@ module EQ
     end
 
     def run
+      debug "manager running"
       loop do
         if EQ.queue && job = EQ.queue.pop
           debug "got #{job.inspect}"
-          if worker = Actor[:worker_pool]
+          if worker = EQ::Working.worker_pool
             debug ' - found worker'
             worker.process! job
           else

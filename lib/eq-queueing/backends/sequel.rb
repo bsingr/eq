@@ -1,7 +1,7 @@
 require 'sequel'
 
-module EQ::QueueAdapter
-  class SequelAdapter
+module EQ::Queueing::Backends
+  class Sequel
     module Decorator
       def size
         db[:jobs].count
@@ -11,7 +11,7 @@ module EQ::QueueAdapter
 
     attr_reader :db
     def initialize
-      @db = Sequel.sqlite
+      @db = ::Sequel.sqlite
       create_table_if_not_exists!
     end
 

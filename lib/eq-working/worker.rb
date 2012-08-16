@@ -1,7 +1,7 @@
-module EQ
+module EQ::Working
   class Worker
     include Celluloid
-    include Logging
+    include EQ::Logging
 
     def initialize
       debug "started worker"

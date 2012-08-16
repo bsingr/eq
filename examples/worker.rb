@@ -1,25 +1,17 @@
 #!/usr/bin/env ruby
-
-require File.join(File.dirname(__FILE__), '..', 'lib', 'eq')
+require File.join(File.dirname(__FILE__), '..', 'lib', 'eq', 'load_all')
 
 def say words; EQ.logger.debug(words); end
-
-class WorkerApplication < Celluloid::SupervisionGroup
-  # TODO celluloid: replace this with the following in the next version
-  # pool Worker, as: worker_pool
-  supervise EQ::Worker, as: :worker_pool, method: 'pool_link'
-  supervise EQ::Manager, as: :manager
-end
 
 class SingleJob
   def self.perform id
     start = Time.now
     say "performing SingleJob #{id}!"
-    raise 1 if id == 1
+    raise "job 1 will die" if id == 1
     5.times do
-      say "  [next tick in SingleJob #{id}]"
-      sleep 0.1
+      say "[next tick in SingleJob #{id}]"
     end
+    sleep 0.01
     took = (((Time.now.to_f - start.to_f)*100).to_i.to_f/100)
     say "SingleJob #{id} was done in #{took} seconds!"
   end
@@ -41,28 +33,29 @@ begin
   say "enqueued BatchJob"
   Timeout.timeout(2) do
     loop do
-      say "starting BackgroundApplication"
+      say "booting"
       EQ.boot
-      background_app = WorkerApplication.run!
+      say " - successfully booted"
       sleep 0.1
-      EQ.queue.push! BatchJob, 2
+      EQ.queue.push! BatchJob, 3
       begin
-        EQ.queue.cras
+        #EQ.queue.cras
       rescue
         sleep 0.1
         say "EQ.queue up again #{EQ.queue}"
       end
       
-      say "started WorkerApplication #{background_app.inspect}"
+      say "started WorkerApplication #{EQ.worker.inspect}"
       sleep 0.1
       # Take five, toplevel supervisor
-      sleep 0.5 while background_app.alive?
+      sleep 0.5 while EQ.worker.alive?
       say "!!! Celluloid::SupervisionGroup WorkerApplication crashed. Restarting..."
     end
   end
 rescue Timeout::Error
   say "timeout reached!"
-  say "finalizing: #{background_app.finalize.inspect}" if background_app
+  say "finalizing: #{EQ.worker.finalize!.inspect}" if EQ.worker
+  say "finalizing: #{EQ.queue.finalize!.inspect}" if EQ.queue
   say 'done'
 end
 
