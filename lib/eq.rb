@@ -7,12 +7,22 @@ require File.join(File.dirname(__FILE__), 'eq', 'job')
 module EQ
   module_function
 
+  def config
+    @config ||= {}
+    yield @config if block_given?
+    @config
+  end
+
   # this boots queuing and working
   # optional: to use another queuing or working subsystem just do
   # require 'eq/working' or require 'eq/queueing' instead of require 'eq/all'
   def boot
     boot_queueing if defined? EQ::Queueing
     boot_working if defined? EQ::Working
+  end
+
+  def shutdown
+    Celluloid.shutdown
   end
 
   def boot_queueing

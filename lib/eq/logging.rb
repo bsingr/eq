@@ -1,8 +1,7 @@
 module EQ
   module Logging
     def debug message
-      EQ.logger.info message
-      STDOUT.flush
+      EQ.logger.debug message
     end
   end
 end

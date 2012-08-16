@@ -19,7 +19,11 @@ module EQ::Queueing::Backends
 
     attr_reader :db
     def initialize
-      @db = ::Sequel.sqlite
+      if sqlite_file = EQ.config[:sqlite] 
+        @db = ::Sequel.sqlite sqlite_file
+      else
+        @db = ::Sequel.sqlite
+      end
       create_table_if_not_exists!
     end
 
