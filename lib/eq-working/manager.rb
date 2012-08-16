@@ -10,7 +10,7 @@ module EQ::Working
     def run
       debug "manager running"
       loop do
-        if EQ.queue && job = EQ.queue.pop
+        if EQ.queue && job = EQ.queue.reserve
           debug "got #{job.inspect}"
           if worker = EQ::Working.worker_pool
             debug ' - found worker'

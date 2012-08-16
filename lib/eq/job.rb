@@ -1,14 +1,23 @@
 module EQ
-  module Job
+  class Job < Struct.new(:id, :serialized_payload)
     class << self
-      def dump const, *payload
-        Marshal.dump([const, *payload])
+      def dump *unserialized_payload
+        Marshal.dump(unserialized_payload)
       end
 
-      def load serialized_payload
-        const, *payload = Marshal.load(serialized_payload)
-        #[const_name.split("::").inject(Kernel){|res,current| res.const_get(current)}, *payload]
+      def load id, serialized_payload
+        Job.new id, serialized_payload
       end
+    end
+
+    def unpack
+      Marshal.load(serialized_payload)
+      #[const_name.split("::").inject(Kernel){|res,current| res.const_get(current)}, *payload]
+    end
+
+    def perform
+      const, *payload = *unpack
+      const.perform *payload
     end
   end
 end

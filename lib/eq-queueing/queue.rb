@@ -2,22 +2,46 @@ module EQ::Queueing
   class Queue
     include Celluloid
     include EQ::Logging
+
+    module Decorator
+      def waiting_count
+        queue.waiting_count
+      end
+
+      def working_count
+        queue.working_count
+      end
+
+      def waiting
+        queue.waiting
+      end
+
+      def working
+        queue.working
+      end
+    end
+    include Decorator
   
     def initialize queue_adapter
       @queue = queue_adapter
     end
 
-    def push *work
-      debug "enqueing #{work.inspect} ..."
-      queue.push EQ::Job.dump(*work)
+    def push *unserialized_payload
+      debug "enqueing #{unserialized_payload.inspect} ..."
+      queue.push EQ::Job.dump(unserialized_payload)
     end
 
-    def pop
-      if payload = queue.pop
-        job = EQ::Job.load payload
+    def reserve
+      if serialized_job = queue.reserve
+        job_id, *serialized_payload = *serialized_job
+        job = EQ::Job.load job_id, serialized_payload
         debug "dequeud #{job.inspect}"
         job
       end
+    end
+
+    def pop job_id
+      queue.pop job_id
     end
 
     def cras

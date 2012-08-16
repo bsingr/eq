@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), 'eq') unless defined? EQ
+require File.join(File.dirname(__FILE__), 'eq')
 require File.join(File.dirname(__FILE__), 'eq-working', 'worker')
 require File.join(File.dirname(__FILE__), 'eq-working', 'manager')
 require File.join(File.dirname(__FILE__), 'eq-working', 'system')

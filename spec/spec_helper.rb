@@ -4,7 +4,7 @@
 # loaded once.
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
-require File.join(File.dirname(__FILE__), '..', 'lib', 'eq')
+require File.join(File.dirname(__FILE__), '..', 'lib', 'eq', 'load_all')
 Dir[File.join(File.dirname(__FILE__), '/support/**/*.rb')].each {|f| require f; puts f}
 
 RSpec.configure do |config|

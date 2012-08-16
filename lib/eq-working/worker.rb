@@ -9,8 +9,8 @@ module EQ::Working
 
     def process job
       debug " -> working..."
-      klass, *payload = job
-      klass.perform *payload
+      job.perform
+      EQ.queue.pop job.id
     end
   end
 end
