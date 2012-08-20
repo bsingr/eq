@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-require File.join(File.dirname(__FILE__), '..', 'lib', 'eq', 'load_all')
+require File.join(File.dirname(__FILE__), '..', 'lib', 'eq', 'boot', 'all')
 
 def say words; EQ.logger.debug(words); end
 
