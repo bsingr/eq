@@ -11,8 +11,8 @@ module EQ
     end
 
     def unpack
-      Marshal.load(serialized_payload)
       #[const_name.split("::").inject(Kernel){|res,current| res.const_get(current)}, *payload]
+      Marshal.load(serialized_payload)
     end
 
     def perform

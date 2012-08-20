@@ -19,6 +19,10 @@ module EQ::Queueing
       def working
         queue.working
       end
+
+      def size
+        queue.size
+      end
     end
     include Decorator
   
@@ -42,10 +46,6 @@ module EQ::Queueing
 
     def pop job_id
       queue.pop job_id
-    end
-
-    def cras
-      raise StandardError, "fo"
     end
 
   private

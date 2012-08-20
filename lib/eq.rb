@@ -42,6 +42,14 @@ module EQ
     EQ::Working.worker
   end
 
+  def queueing?
+    queue.alive?
+  end
+
+  def working?
+    worker.alive?
+  end
+
   def logger
     Celluloid.logger
   end
