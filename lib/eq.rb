@@ -22,7 +22,8 @@ module EQ
   end
 
   def shutdown
-    Celluloid.shutdown
+    EQ::Working.shutdown if defined? EQ::Working
+    EQ::Queueing.shutdown if defined? EQ::Queueing
   end
 
   def boot_queueing

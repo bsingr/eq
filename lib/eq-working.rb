@@ -10,6 +10,10 @@ module EQ::Working
     Celluloid::Actor[:_eq_working] = EQ::Working::System.run!
   end
 
+  def shutdown
+    worker.finalize! if worker
+  end
+
   def worker
     Celluloid::Actor[:_eq_working]
   end

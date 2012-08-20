@@ -54,8 +54,7 @@ begin
   end
 rescue Timeout::Error
   say "timeout reached!"
-  say "finalizing: #{EQ.worker.finalize!.inspect}" if EQ.worker
-  say "finalizing: #{EQ.queue.terminate!.inspect}" if EQ.queue
+  sat "shutdown: #{EQ.shutdown}"
   say 'done'
 end
 
