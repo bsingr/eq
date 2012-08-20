@@ -20,9 +20,10 @@ module EQ::Queueing
         queue.working
       end
 
-      def size
-        queue.size
+      def job_count
+        queue.job_count
       end
+      alias :size :job_count
     end
     include Decorator
   

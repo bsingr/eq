@@ -4,27 +4,6 @@ module EQ::Queueing::Backends
   class Sequel
     include EQ::Logging
 
-    module Decorator
-      def size
-        db[:jobs].count
-      rescue ::Sequel::DatabaseError => e
-        retry if on_error e
-      end
-
-      def working_count
-        working.count
-      rescue ::Sequel::DatabaseError => e
-        retry if on_error e
-      end
-
-      def waiting_count
-        waiting.count
-      rescue ::Sequel::DatabaseError => e
-        retry if on_error e
-      end
-    end
-    include Decorator
-
     attr_reader :db
     def initialize
       if sqlite_file = EQ.config[:sqlite] 
@@ -37,6 +16,7 @@ module EQ::Queueing::Backends
       retry if on_error e
     end
 
+    # @param
     def push payload
       jobs.insert payload: payload.to_sequel_blob #, created_at: now
     rescue ::Sequel::DatabaseError => e
@@ -85,6 +65,20 @@ module EQ::Queueing::Backends
       db[:jobs].where(id: changed_job[:id]).update(changed_job)
     rescue ::Sequel::DatabaseError => e
       retry if on_error e
+    end
+
+    # statistics:
+    #   - #job_count
+    #   - #working_count
+    #   - #waiting_count
+    %w[ job working waiting ].each do |stats_name|
+      define_method "#{stats_name}_count" do
+        begin
+          send(stats_name).send(:count)
+        rescue ::Sequel::DatabaseError => e
+          retry if on_error e
+        end
+      end
     end
 
   private

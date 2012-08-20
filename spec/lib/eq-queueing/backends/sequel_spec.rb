@@ -16,8 +16,8 @@ describe EQ::Queueing::Backends::Sequel do
         raise ::Sequel::DatabaseError, "failed"
       end
     end
-    subject.size.should == 0
+    subject.waiting_count.should == 0
     subject.push "foo"
-    subject.size.should == 1
+    subject.waiting_count.should == 1
   end
 end
