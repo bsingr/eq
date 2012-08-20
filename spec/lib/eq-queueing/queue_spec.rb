@@ -6,6 +6,7 @@ describe EQ::Queueing::Queue do
       def push payload
         raise ArgumentError, "queue_backend mock only supports one waiting job at a time" if waiting
         self.waiting = [1, payload]
+        1
       end
 
       def reserve
@@ -17,8 +18,19 @@ describe EQ::Queueing::Queue do
       end
 
       def pop id
-        raise ArgumentError, "no working job" if !working
-        self.working = nil
+        result = false
+        
+        if waiting && id == waiting.first
+          self.waiting = nil
+          result = true
+        end
+
+        if working && id == working.first
+          self.working = nil
+          result = true
+        end
+        
+        result
       end
 
       def waiting_count; waiting ? 1 : 0; end

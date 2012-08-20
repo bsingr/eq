@@ -16,17 +16,21 @@ module EQ::Queueing::Backends
       retry if on_error e
     end
 
-    # @param
+    # @param [#to_sequel_block] payload
+    # @return [Fixnum] id of the job
     def push payload
-      jobs.insert payload: payload.to_sequel_blob #, created_at: now
+      jobs.insert payload: payload.to_sequel_blob, created_at: now
     rescue ::Sequel::DatabaseError => e
       retry if on_error e
     end
 
-    # TODO this must be a lock & delete, not a pop!!
+    # pulls a job from the waiting stack and moves it to the
+    # working stack. sets a timestamp :started_working_at so that
+    # the working duration can be tracked.
+    # @return [Array<Fixnum, String>] job data consisting of id and payload
     def reserve
       db.transaction do
-        job = waiting.order(:id.desc).limit(1).first
+        job = waiting.order(:id.asc).limit(1).first
         if job
           job[:started_working_at] = now
           update_job!(job)
@@ -37,8 +41,11 @@ module EQ::Queueing::Backends
       retry if on_error e
     end
 
+    # finishes a job in the working queue
+    # @param [Fixnum] id of the job
+    # @return [TrueClass, FalseClass] true, when there was a job that could be deleted
     def pop id
-      jobs.where(id: id).delete
+      jobs.where(id: id).delete == 1
     rescue ::Sequel::DatabaseError => e
       retry if on_error e
     end
