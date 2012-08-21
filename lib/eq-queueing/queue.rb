@@ -29,6 +29,7 @@ module EQ::Queueing
 
     # @return [EQ::Job, nilClass] job instance
     def reserve
+      requeue_timed_out_jobs
       if serialized_job = queue.reserve
         job_id, serialized_payload = *serialized_job
         job = EQ::Job.load job_id, serialized_payload
@@ -42,7 +43,10 @@ module EQ::Queueing
       queue.pop job_id
     end
 
-  private
+    # re-enqueues jobs that timed out
+    def requeue_timed_out_jobs
+      queue.requeue_timed_out_jobs
+    end
 
     attr_reader :queue
 

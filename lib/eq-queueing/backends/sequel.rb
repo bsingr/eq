@@ -22,7 +22,7 @@ module EQ::Queueing::Backends
     # @param [#to_sequel_block] payload
     # @return [Fixnum] id of the job
     def push payload
-      jobs.insert payload: payload.to_sequel_blob, created_at: now
+      jobs.insert payload: payload.to_sequel_blob, created_at: Time.now
     rescue ::Sequel::DatabaseError => e
       retry if on_error e
     end
@@ -30,11 +30,12 @@ module EQ::Queueing::Backends
     # pulls a job from the waiting stack and moves it to the
     # working stack. sets a timestamp :started_working_at so that
     # the working duration can be tracked.
+    # @param [Time] now
     # @return [Array<Fixnum, String>] job data consisting of id and payload
     def reserve
       db.transaction do
         if job = waiting.order(:id.asc).limit(1).first
-          job[:started_working_at] = now
+          job[:started_working_at] = Time.now
           update_job!(job)
           [job[:id], job[:payload]]
         end
@@ -81,6 +82,14 @@ module EQ::Queueing::Backends
       retry if on_error e
     end
 
+    # this re-enqueues jobs that timed out
+    # @return [Fixnum] number of jobs that were re-enqueued
+    def requeue_timed_out_jobs
+      # 10 seconds ago
+      jobs.where{started_working_at <= (Time.now - EQ.config.job_timeout)}\
+          .update(started_working_at: nil)
+    end
+
     # statistics:
     #   - #job_count
     #   - #working_count
@@ -96,10 +105,6 @@ module EQ::Queueing::Backends
     end
 
   private
-
-    def now
-      Time.now
-    end
 
     # connects to the given database config
     def connect config

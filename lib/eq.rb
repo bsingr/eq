@@ -10,7 +10,8 @@ module EQ
 
   DEFAULT_CONFIG = {
     queueing: 'sequel',
-    sequel: 'sqlite:/'
+    sequel: 'sqlite:/',
+    job_timeout: 5 # in seconds
   }.freeze
 
   module_function

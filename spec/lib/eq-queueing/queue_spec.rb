@@ -12,8 +12,22 @@ describe EQ::Queueing::Queue do
       def reserve
         raise ArgumentError, "queue_backend mock only supports one working job at a time" if working
         if self.working = waiting
+          self.working << Time.now
           self.waiting = nil
           return working
+        end
+      end
+
+      def requeue_timed_out_jobs
+        raise ArgumentError, "queue_backend mock only supports on waiting job at a time" if waiting && working
+        # timeout after EQ.config.job_timeout seconds
+        if working && working.last <= (Time.now - EQ.config.job_timeout)
+          working.pop
+          self.waiting = working
+          self.working = nil
+          1
+        else
+          0
         end
       end
 
