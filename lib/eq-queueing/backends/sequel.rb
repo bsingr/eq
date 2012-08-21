@@ -4,6 +4,8 @@ module EQ::Queueing::Backends
   class Sequel
     include EQ::Logging
 
+    TABLE_NAME = :jobs
+
     attr_reader :db
     def initialize
       if sqlite_file = EQ.config[:sqlite] 
@@ -63,13 +65,13 @@ module EQ::Queueing::Backends
     end
 
     def jobs
-      db[:jobs]
+      db[TABLE_NAME]
     rescue ::Sequel::DatabaseError => e
       retry if on_error e
     end
 
     def update_job! changed_job
-      db[:jobs].where(id: changed_job[:id]).update(changed_job)
+      jobs.where(id: changed_job[:id]).update(changed_job)
     rescue ::Sequel::DatabaseError => e
       retry if on_error e
     end
@@ -95,7 +97,7 @@ module EQ::Queueing::Backends
     end
 
     def create_table_if_not_exists!
-      db.create_table? :jobs do
+      db.create_table? TABLE_NAME do
         primary_key :id
         Timestamp :created_at
         Timestamp :started_working_at
