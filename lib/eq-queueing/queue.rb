@@ -3,29 +3,12 @@ module EQ::Queueing
     include Celluloid
     include EQ::Logging
 
-    module Decorator
-      def waiting_count
-        queue.waiting_count
+    %w[ job_count waiting_count working_count waiting working ].each do |method_name|
+      define_method method_name do
+        queue.send(method_name)
       end
-
-      def working_count
-        queue.working_count
-      end
-
-      def waiting
-        queue.waiting
-      end
-
-      def working
-        queue.working
-      end
-
-      def job_count
-        queue.job_count
-      end
-      alias :size :job_count
     end
-    include Decorator
+    alias :size :job_count
   
     def initialize queue_adapter
       @queue = queue_adapter
