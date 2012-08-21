@@ -6,7 +6,8 @@ module EQ::Queueing
   module_function
 
   def boot
-    EQ::Queueing::Queue.supervise_as :_eq_queueing, EQ::Queueing::Backends::Sequel.new
+    
+    EQ::Queueing::Queue.supervise_as :_eq_queueing, initialize_queueing_backend
   end
 
   def shutdown
@@ -15,5 +16,16 @@ module EQ::Queueing
 
   def queue
     Celluloid::Actor[:_eq_queueing]
+  end
+
+  # @raise ConfigurationError when EQ.config.queue is not supported
+  def initialize_queueing_backend
+    queue_config = EQ.config.send(EQ.config.queue)
+    case EQ.config.queue
+    when 'sequel'
+      EQ::Queueing::Backends::Sequel.new queue_config
+    else
+      raise ConfigurationError, "EQ.config.queue = '#{EQ.config.queue}' is not supported!"
+    end
   end
 end

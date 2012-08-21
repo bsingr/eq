@@ -1,3 +1,4 @@
+require 'ostruct'
 require 'celluloid'
 
 require File.join(File.dirname(__FILE__), 'eq', 'version')
@@ -5,10 +6,17 @@ require File.join(File.dirname(__FILE__), 'eq', 'logging')
 require File.join(File.dirname(__FILE__), 'eq', 'job')
 
 module EQ
+  class ConfigurationError < ArgumentError; end
+
+  DEFAULT_CONFIG = {
+    queueing: 'sequel',
+    sequel: 'sqlite:/'
+  }.freeze
+
   module_function
 
   def config
-    @config ||= {}
+    @config ||= OpenStruct.new DEFAULT_CONFIG
     yield @config if block_given?
     @config
   end

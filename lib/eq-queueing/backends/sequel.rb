@@ -1,21 +1,22 @@
 require 'sequel'
 
 module EQ::Queueing::Backends
+
+  # this class provides a queueing backend via Sequel ORM mapper
+  # basically any database adapter known by Sequel is supported
+  # configure via EQ::conig[:sequel]
   class Sequel
     include EQ::Logging
 
     TABLE_NAME = :jobs
 
     attr_reader :db
-    def initialize
-      if sqlite_file = EQ.config[:sqlite] 
-        @db = ::Sequel.sqlite sqlite_file
-      else
-        @db = ::Sequel.sqlite
-      end
-      create_table_if_not_exists!      
-    rescue ::Sequel::DatabaseError => e
-      retry if on_error e
+
+    # establishes the connection to the database and ensures that
+    # the jobs table is created
+    def initialize config
+      connect config
+      create_table_if_not_exists!
     end
 
     # @param [#to_sequel_block] payload
@@ -32,8 +33,7 @@ module EQ::Queueing::Backends
     # @return [Array<Fixnum, String>] job data consisting of id and payload
     def reserve
       db.transaction do
-        job = waiting.order(:id.asc).limit(1).first
-        if job
+        if job = waiting.order(:id.asc).limit(1).first
           job[:started_working_at] = now
           update_job!(job)
           [job[:id], job[:payload]]
@@ -52,24 +52,29 @@ module EQ::Queueing::Backends
       retry if on_error e
     end
 
+    # list of jobs waiting to be worked on
     def waiting
       jobs.where(started_working_at: nil)
     rescue ::Sequel::DatabaseError => e
       retry if on_error e
     end
 
+    # list of jobs currentyl being worked on
     def working
       waiting.invert
     rescue ::Sequel::DatabaseError => e
       retry if on_error e
     end
 
+    # list of all jobs
     def jobs
       db[TABLE_NAME]
     rescue ::Sequel::DatabaseError => e
       retry if on_error e
     end
 
+    # updates a changed job object, uses the :id key to identify the job
+    # @param [Hash] changed job
     def update_job! changed_job
       jobs.where(id: changed_job[:id]).update(changed_job)
     rescue ::Sequel::DatabaseError => e
@@ -94,6 +99,13 @@ module EQ::Queueing::Backends
 
     def now
       Time.now
+    end
+
+    # connects to the given database config
+    def connect config
+      @db = ::Sequel.connect config
+    rescue ::Sequel::DatabaseError => e
+      retry if on_error e
     end
 
     def create_table_if_not_exists!
