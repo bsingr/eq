@@ -10,11 +10,13 @@ module EQ
       end
     end
 
+    # unmarshals the serialized_payload
     def unpack
       #[const_name.split("::").inject(Kernel){|res,current| res.const_get(current)}, *payload]
       Marshal.load(serialized_payload)
     end
 
+    # calls MyJobClass.perform(*payload)
     def perform
       const, *payload = unpack
       const.perform *payload

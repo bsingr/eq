@@ -7,8 +7,9 @@ module EQ::Working
       run!
     end
 
+    # polls the EQ.queue via EQ.queue.reserve
     def run
-      debug "manager running"
+      debug "worker manager running"
       loop do
         if EQ.queue && job = EQ.queue.reserve
           debug "got #{job.inspect}"
@@ -19,7 +20,7 @@ module EQ::Working
             debug ' - no worker'
           end
         else
-          #debug 'no job'
+          # currently no job
         end
         sleep 0.01
       end

@@ -1,4 +1,9 @@
 module EQ::Queueing
+  
+  # this class basically provides a API that wraps the low-level calls
+  # to the queueing backend that is configured and passed to the #initialize method
+  # furthermore this class adds some functionality to serialize / deserialze
+  # using the Job class
   class Queue
     include Celluloid
     include EQ::Logging
@@ -9,16 +14,20 @@ module EQ::Queueing
       end
     end
     alias :size :job_count
-  
-    def initialize queue_adapter
-      @queue = queue_adapter
+    
+    # @param [Object] queue_backend
+    def initialize queue_backend
+      @queue = queue_backend
     end
 
+    # @param [Array<Class, *payload>] unserialized_payload
+    # @return [Fixnum] job_id 
     def push *unserialized_payload
       debug "enqueing #{unserialized_payload.inspect} ..."
       queue.push EQ::Job.dump(unserialized_payload)
     end
 
+    # @return [EQ::Job, nilClass] job instance
     def reserve
       if serialized_job = queue.reserve
         job_id, serialized_payload = *serialized_job
@@ -28,6 +37,7 @@ module EQ::Queueing
       end
     end
 
+    # @return [TrueClass, FalseClass]
     def pop job_id
       queue.pop job_id
     end

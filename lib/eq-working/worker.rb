@@ -4,11 +4,13 @@ module EQ::Working
     include EQ::Logging
 
     def initialize
-      debug "started worker"
+      debug "initialized worker"
     end
 
+    # @param [EQ::Job] job instance
+    # @return [TrueClass, FalseClass] true when job is done and deleted
     def process job
-      debug " -> working..."
+      debug "processing #{job.inspect}"
       job.perform
       EQ.queue.pop job.id
     end
