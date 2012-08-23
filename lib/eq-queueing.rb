@@ -6,7 +6,6 @@ module EQ::Queueing
   module_function
 
   def boot
-    
     EQ::Queueing::Queue.supervise_as :_eq_queueing, initialize_queueing_backend
   end
 
@@ -25,7 +24,7 @@ module EQ::Queueing
     when 'sequel'
       EQ::Queueing::Backends::Sequel.new queue_config
     else
-      raise ConfigurationError, "EQ.config.queue = '#{EQ.config.queue}' is not supported!"
+      raise EQ::ConfigurationError, "EQ.config.queue = '#{EQ.config.queue}' is not supported!"
     end
   end
 end

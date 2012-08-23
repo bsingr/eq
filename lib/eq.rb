@@ -9,7 +9,7 @@ module EQ
   class ConfigurationError < ArgumentError; end
 
   DEFAULT_CONFIG = {
-    queueing: 'sequel',
+    queue: 'sequel',
     sequel: 'sqlite:/',
     job_timeout: 5 # in seconds
   }.freeze
