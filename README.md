@@ -33,8 +33,8 @@ If you want to execute a simple example you can just run [examples/simple_usage.
 	
 **3. Let EQ do some work you.**
 
-	EQ.queue.push MyJob, 'foo'
-	EQ.queue.push MyJob, 'bar'
+	EQ.push MyJob, 'foo'
+	EQ.push MyJob, 'bar'
 	…	
 
 ## Configuration

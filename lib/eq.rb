@@ -1,4 +1,8 @@
+# STDLIB
 require 'ostruct'
+require 'forwardable'
+
+# rubygems
 require 'celluloid'
 
 require File.join(File.dirname(__FILE__), 'eq', 'version')
@@ -6,6 +10,8 @@ require File.join(File.dirname(__FILE__), 'eq', 'logging')
 require File.join(File.dirname(__FILE__), 'eq', 'job')
 
 module EQ
+  extend SingleForwardable
+
   class ConfigurationError < ArgumentError; end
 
   DEFAULT_CONFIG = {
@@ -47,9 +53,16 @@ module EQ
     EQ::Queueing.queue
   end
 
+  # queue methods
+  %w[ jobs waiting working
+      push reserve pop].each do |method_name|
+    def_delegator :queue, method_name
+  end
+
   def worker
     EQ::Working.worker
   end
+
 
   def queueing?
     queue.alive?
