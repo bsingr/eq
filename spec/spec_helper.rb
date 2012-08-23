@@ -7,6 +7,8 @@
 require File.join(File.dirname(__FILE__), '..', 'lib', 'eq', 'boot', 'all')
 Dir[File.join(File.dirname(__FILE__), '/support/**/*.rb')].each {|f| require f; puts f}
 
+Celluloid.logger = Logger.new(File.join(File.dirname(__FILE__), '..', 'log', 'rspec.log'))
+
 RSpec.configure do |config|
   config.treat_symbols_as_metadata_keys_with_true_values = true
   config.run_all_when_everything_filtered = true
