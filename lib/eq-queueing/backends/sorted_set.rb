@@ -29,6 +29,8 @@ module EQ::Queueing::Backends
         job.started_working_at = Time.now
         return [job.id, job.payload]
       end
+    rescue ArgumentError => e
+      on_error e
     end
 
     def pop job_id
@@ -51,6 +53,8 @@ module EQ::Queueing::Backends
         end
       end
       requeued
+    rescue ArgumentError => e
+      on_error e
     end
 
     def waiting
@@ -67,6 +71,14 @@ module EQ::Queueing::Backends
         result << job if job.started_working_at
       end
       result
+    end
+
+  private
+
+    def on_error error
+      #log_error error.inspect
+      sleep 0.05
+      true
     end
   end
 end

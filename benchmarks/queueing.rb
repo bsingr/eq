@@ -5,6 +5,7 @@ require File.join(File.dirname(__FILE__), '..', 'lib', 'eq', 'boot', 'all')
 require 'benchmark'
 require 'tempfile'
 
+#Celluloid.logger = Logger.new('/dev/null')
 EQ.logger.level = Logger::Severity::ERROR
 
 class MyJob
@@ -16,18 +17,28 @@ n = 1000
 Benchmark.bm(50) do |b|
   EQ.boot
   b.report('memory-based sqlite') do
-    n.times { |i| EQ.queue.push! MyJob, i }
-    EQ.queue.waiting.count # block
+    n.times { |i| EQ.queue.push! MyJob, i
+                  EQ.jobs.count }
   end
   EQ.shutdown
 
   EQ.config do |config|
-    config[:sqlite] = Tempfile.new('').path
+    config.sqlite = Tempfile.new('').path
   end
   EQ.boot
   b.report('file-based sqlite') do
-    n.times { |i| EQ.queue.push! MyJob, i }
-    EQ.queue.waiting.count # block
+    n.times { |i| EQ.queue.push! MyJob, i 
+                  EQ.jobs.count}
+  end
+  EQ.shutdown
+
+  EQ.config do |config|
+  config.queue = 'sorted_set'
+  end
+  EQ.boot
+  b.report('sorted set') do
+    n.times { |i| EQ.queue.push! MyJob, i
+                  EQ.jobs.count }
   end
   EQ.shutdown
 end
