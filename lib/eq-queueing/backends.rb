@@ -4,3 +4,5 @@ module EQ::Queueing
 end
 
 require File.join(File.dirname(__FILE__), 'backends', 'sequel')
+require File.join(File.dirname(__FILE__), 'backends', 'sorted_set')
+

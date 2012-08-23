@@ -18,7 +18,7 @@ Benchmark.bm(50) do |b|
   n.times { |i| EQ.queue.push! MyJob, i }
   b.report('memory-based sqlite') do
     EQ.boot_working
-    sleep 0.01 until EQ.queue.waiting_count == 0
+    sleep 0.01 until EQ.queue.waiting.count == 0
   end
   EQ.shutdown
 
@@ -29,7 +29,7 @@ Benchmark.bm(50) do |b|
   n.times { |i| EQ.queue.push! MyJob, i }
   b.report('file-based sqlite') do
     EQ.boot_working
-    sleep 0.01 until EQ.queue.waiting_count == 0
+    sleep 0.01 until EQ.queue.waiting.count == 0
   end
   EQ.shutdown
 end

@@ -90,20 +90,6 @@ module EQ::Queueing::Backends
           .update(started_working_at: nil)
     end
 
-    # statistics:
-    #   - #jobs_count
-    #   - #working_count
-    #   - #waiting_count
-    %w[ jobs working waiting ].each do |stats_name|
-      define_method "#{stats_name}_count" do
-        begin
-          send(stats_name).send(:count)
-        rescue ::Sequel::DatabaseError => e
-          retry if on_error e
-        end
-      end
-    end
-
   private
 
     # connects to the given database config

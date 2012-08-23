@@ -23,6 +23,8 @@ module EQ::Queueing
     case EQ.config.queue
     when 'sequel'
       EQ::Queueing::Backends::Sequel.new queue_config
+    when 'sorted_set'
+      EQ::Queueing::Backends::SortedSet.new queue_config
     else
       raise EQ::ConfigurationError, "EQ.config.queue = '#{EQ.config.queue}' is not supported!"
     end

@@ -5,15 +5,12 @@ module EQ::Queueing
   # furthermore this class adds some functionality to serialize / deserialze
   # using the Job class
   class Queue
+    extend SingleForwardable
+
     include Celluloid
     include EQ::Logging
 
-    %w[ jobs waiting working jobs_count waiting_count working_count ].each do |method_name|
-      define_method method_name do
-        queue.send(method_name)
-      end
-    end
-    alias :size :jobs_count
+    attr_reader :queue
     
     # @param [Object] queue_backend
     def initialize queue_backend
@@ -38,17 +35,17 @@ module EQ::Queueing
       end
     end
 
-    # @return [TrueClass, FalseClass]
-    def pop job_id
-      queue.pop job_id
+    # 
+    # TODO #pop method: shall we add a check, when the job is worked on, if we are the worker?
+    # 
+    def pop *args
+      queue.pop *args
     end
 
-    # re-enqueues jobs that timed out
-    def requeue_timed_out_jobs
-      queue.requeue_timed_out_jobs
-    end
+    def requeue_timed_out_jobs; queue.requeue_timed_out_jobs; end
 
-    attr_reader :queue
-
+    def jobs; queue.jobs; end
+    def working; queue.working; end
+    def waiting; queue.waiting; end
   end
 end
