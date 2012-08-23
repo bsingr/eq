@@ -91,10 +91,10 @@ module EQ::Queueing::Backends
     end
 
     # statistics:
-    #   - #job_count
+    #   - #jobs_count
     #   - #working_count
     #   - #waiting_count
-    %w[ job working waiting ].each do |stats_name|
+    %w[ jobs working waiting ].each do |stats_name|
       define_method "#{stats_name}_count" do
         begin
           send(stats_name).send(:count)

@@ -47,6 +47,7 @@ describe EQ::Queueing::Queue do
         result
       end
 
+      def jobs_count; waiting_count + working_count; end
       def waiting_count; waiting ? 1 : 0; end
       def working_count; working ? 1 : 0; end
     end.new

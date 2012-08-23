@@ -9,9 +9,11 @@ end
 
 shared_examples_for 'abstract queue' do
   it 'pushes jobs' do
+    subject.jobs_count.should == 0
     subject.waiting_count.should == 0
     subject.working_count.should == 0
     subject.push("foo").should == 1 # job id
+    subject.jobs_count.should == 1
     subject.waiting_count.should == 1
     subject.working_count.should == 0
   end

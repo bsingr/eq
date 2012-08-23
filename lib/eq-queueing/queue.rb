@@ -8,12 +8,12 @@ module EQ::Queueing
     include Celluloid
     include EQ::Logging
 
-    %w[ job_count waiting_count working_count waiting working ].each do |method_name|
+    %w[ jobs waiting working jobs_count waiting_count working_count ].each do |method_name|
       define_method method_name do
         queue.send(method_name)
       end
     end
-    alias :size :job_count
+    alias :size :jobs_count
     
     # @param [Object] queue_backend
     def initialize queue_backend
