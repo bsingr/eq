@@ -4,6 +4,9 @@
 # loaded once.
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
+
+require 'fileutils'
+
 require File.join(File.dirname(__FILE__), '..', 'lib', 'eq', 'boot', 'all')
 Dir[File.join(File.dirname(__FILE__), '/support/**/*.rb')].each {|f| require f; puts f}
 
@@ -19,6 +22,12 @@ RSpec.configure do |config|
   # the seed, which is printed after each run.
   #     --seed 1234
   config.order = 'random'
+
+  config.before :suite do
+    # cleanup rspec files
+    FileUtils.rm_rf 'tmp/rspec'
+    FileUtils.mkdir_p 'tmp/rspec'
+  end
 end
 
 require "timecop"

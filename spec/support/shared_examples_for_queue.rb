@@ -2,7 +2,7 @@ shared_examples_for 'queue backend' do
   it 'pushes and pops' do
     subject.push "foo"
     job_id, payload = *subject.reserve
-    job_id.should == 1
+    job_id.should_not be_nil
     payload.should == "foo"
   end
 end
@@ -15,7 +15,7 @@ shared_examples_for 'abstract queue' do
   end
 
   it 'pushes jobs' do
-    subject.push("foo").should == 1 # job id
+    subject.push("foo").should_not be_nil # job_id
     subject.count(:jobs).should == 1
     subject.count(:waiting).should == 1
     subject.count(:working).should == 0
@@ -34,11 +34,11 @@ shared_examples_for 'abstract queue' do
 
   it 'pops jobs' do
     subject.pop(1).should be_false # no job
-    subject.push "foo"
+    job_id = subject.push "foo"
     subject.count(:jobs).should == 1
     subject.count(:waiting).should == 1
     subject.count(:working).should == 0
-    subject.pop(1).should be_true # one job
+    subject.pop(job_id).should be_true # one job
     subject.count(:jobs).should == 0
     subject.count(:waiting).should == 0
     subject.count(:working).should == 0

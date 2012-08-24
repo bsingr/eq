@@ -5,4 +5,5 @@ end
 
 require File.join(File.dirname(__FILE__), 'backends', 'sequel')
 require File.join(File.dirname(__FILE__), 'backends', 'sorted_set')
+require File.join(File.dirname(__FILE__), 'backends', 'leveldb')
 

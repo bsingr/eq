@@ -15,9 +15,17 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = EQ::VERSION
 
-  gem.add_dependency "sqlite3"
-  gem.add_dependency "sequel"
   gem.add_dependency "celluloid"
+
+  # sequel backend
+  gem.add_dependency "sequel"
+
+  # sequel with sqlite
+  gem.add_dependency "sqlite3"
+
+  # leveldb backend
+  gem.add_dependency "leveldb-ruby"
+
   gem.add_development_dependency "guard"
   gem.add_development_dependency "guard-rspec"
   gem.add_development_dependency "rspec"
