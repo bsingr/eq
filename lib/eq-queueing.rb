@@ -25,6 +25,8 @@ module EQ::Queueing
       EQ::Queueing::Backends::Sequel.new queue_config
     when 'sorted_set'
       EQ::Queueing::Backends::SortedSet.new queue_config
+    when 'leveldb'
+      EQ::Queueing::Backends::LevelDB.new queue_config
     else
       raise EQ::ConfigurationError, "EQ.config.queue = '#{EQ.config.queue}' is not supported!"
     end
