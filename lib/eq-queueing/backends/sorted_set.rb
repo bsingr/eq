@@ -40,7 +40,7 @@ module EQ::Queueing::Backends
     end
 
     def requeue_timed_out_jobs
-      # 10 seconds ago
+      # older than x
       requeued = 0
       working.each do |job|
         if job.started_working_at <= (Time.now - EQ.config.job_timeout)

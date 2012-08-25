@@ -85,7 +85,7 @@ module EQ::Queueing::Backends
     # this re-enqueues jobs that timed out
     # @return [Fixnum] number of jobs that were re-enqueued
     def requeue_timed_out_jobs
-      # 10 seconds ago
+      # older than x
       jobs.where{started_working_at <= (Time.now - EQ.config.job_timeout)}\
           .update(started_working_at: nil)
     end
