@@ -47,5 +47,6 @@ module EQ::Queueing
     def jobs; queue.jobs; end
     def working; queue.working; end
     def waiting; queue.waiting; end
+    def count name=nil; queue.count name; end
   end
 end

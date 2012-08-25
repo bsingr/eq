@@ -90,6 +90,17 @@ module EQ::Queueing::Backends
           .update(started_working_at: nil)
     end
 
+    def count name=nil
+      case name
+      when :waiting
+        waiting.count
+      when :working
+        working.count
+      else
+        jobs.count
+      end
+    end
+
   private
 
     # connects to the given database config

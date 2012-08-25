@@ -7,15 +7,11 @@ module EQ::Queueing::Backends
       alias :'<=>' :id
     end
 
-    class JobRecordCollection < ::SortedSet
-      alias :count :size
-    end
-
     attr_reader :jobs
 
     def initialize config = nil
       @config = config
-      @jobs = JobRecordCollection.new
+      @jobs = ::SortedSet.new
     end
 
     def push payload
@@ -58,7 +54,7 @@ module EQ::Queueing::Backends
     end
 
     def waiting
-      result = JobRecordCollection.new
+      result = ::SortedSet.new
       jobs.each do |job|
         result << job unless job.started_working_at
       end
@@ -66,11 +62,22 @@ module EQ::Queueing::Backends
     end
 
     def working
-      result = JobRecordCollection.new
+      result = ::SortedSet.new
       jobs.each do |job|
         result << job if job.started_working_at
       end
       result
+    end
+
+    def count name=nil
+      case name
+      when :waiting
+        waiting.size
+      when :working
+        working.size
+      else
+        jobs.size
+      end
     end
 
   private

@@ -9,39 +9,39 @@ end
 
 shared_examples_for 'abstract queue' do
   it 'has no jobs at the beginning' do
-    subject.jobs.count.should == 0
-    subject.waiting.count.should == 0
-    subject.working.count.should == 0
+    subject.count(:jobs).should == 0
+    subject.count(:waiting).should == 0
+    subject.count(:working).should == 0
   end
 
   it 'pushes jobs' do
     subject.push("foo").should == 1 # job id
-    subject.jobs.count.should == 1
-    subject.waiting.count.should == 1
-    subject.working.count.should == 0
+    subject.count(:jobs).should == 1
+    subject.count(:waiting).should == 1
+    subject.count(:working).should == 0
   end
 
   it 'reserves jobs' do
     id = subject.push "foo"
-    subject.jobs.count.should == 1
-    subject.waiting.count.should == 1
-    subject.working.count.should == 0
+    subject.count(:jobs).should == 1
+    subject.count(:waiting).should == 1
+    subject.count(:working).should == 0
     subject.reserve
-    subject.jobs.count.should == 1
-    subject.waiting.count.should == 0
-    subject.working.count.should == 1
+    subject.count(:jobs).should == 1
+    subject.count(:waiting).should == 0
+    subject.count(:working).should == 1
   end
 
   it 'pops jobs' do
     subject.pop(1).should be_false # no job
     subject.push "foo"
-    subject.jobs.count.should == 1
-    subject.waiting.count.should == 1
-    subject.working.count.should == 0
+    subject.count(:jobs).should == 1
+    subject.count(:waiting).should == 1
+    subject.count(:working).should == 0
     subject.pop(1).should be_true # one job
-    subject.jobs.count.should == 0
-    subject.waiting.count.should == 0
-    subject.working.count.should == 0
+    subject.count(:jobs).should == 0
+    subject.count(:waiting).should == 0
+    subject.count(:working).should == 0
     subject.pop(1).should be_false # again no job"
   end
 
@@ -56,15 +56,15 @@ shared_examples_for 'abstract queue' do
       data = subject.reserve
 
       # no on working at the beginning
-      subject.waiting.count.should == 0
-      subject.working.count.should == 1
+      subject.count(:waiting).should == 0
+      subject.count(:working).should == 1
 
       # no one will be re-enqueued
       subject.requeue_timed_out_jobs.should == 0
 
       # no on working after senseless re-enqueueing
-      subject.waiting.count.should == 0
-      subject.working.count.should == 1
+      subject.count(:waiting).should == 0
+      subject.count(:working).should == 1
 
     end
 
@@ -72,15 +72,15 @@ shared_examples_for 'abstract queue' do
     Timecop.freeze(Time.new(1986, 01, 01, 00, 00, EQ.config.job_timeout)) do  
       
       # nothing happened yet...
-      subject.waiting.count.should == 0
-      subject.working.count.should == 1
+      subject.count(:waiting).should == 0
+      subject.count(:working).should == 1
 
       # this time one will be re-enqueued
       subject.requeue_timed_out_jobs.should == 1
     
       # now the old job is available again
-      subject.waiting.count.should == 1
-      subject.working.count.should == 0
+      subject.count(:waiting).should == 1
+      subject.count(:working).should == 0
 
     end
   end
