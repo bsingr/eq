@@ -3,7 +3,7 @@ require File.join(File.dirname(__FILE__), '..', 'lib', 'eq', 'boot', 'all')
 
 EQ.logger.level = Logger::Severity::INFO
 EQ.config do |config|
-  config[:sqlite] = "foo.sqlite"
+  config.sequel = "sqlite://foo.sqlite"
 end
 
 def say words; EQ.logger.info(words); end
@@ -17,7 +17,7 @@ end
 
 require 'timeout'
 begin
-  Timeout.timeout(120) do
+  Timeout.timeout(10) do
     EQ.boot
     sleep 0.5 while EQ.working?
   end

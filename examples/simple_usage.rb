@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 require File.join(File.dirname(__FILE__), '..', 'lib', 'eq', 'boot', 'all')
 
+Celluloid.logger = Logger.new('/dev/null')
+
 # Define a Job class with a perform method.
 class MyJob
   RESULT_PATH = 'my_job_result.txt'
@@ -25,8 +27,8 @@ File.delete MyJob::RESULT_PATH if File.exists? MyJob::RESULT_PATH
 EQ.boot
 
 # Enqueue some work.
-EQ.queue.push MyJob, Time.now, 1
-EQ.queue.push MyJob, Time.now, 2
+EQ.queue.push! MyJob, Time.now, 1
+EQ.queue.push! MyJob, Time.now, 2
 
 # Wait some time to get the work done.
 sleep 3
