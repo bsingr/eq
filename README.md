@@ -39,19 +39,41 @@ If you want to execute a simple example you can just run [examples/simple_usage.
 
 ## Configuration
 
-Right now there is only one queueing backend available that is based on the Sequel gem. Therefore, basically any SQL database supported by Sequel might be used.
+Right now there are two queueing backends available, one that is based on the Sequel gem and one based on LevelDB. With Sequel basically any SQL database might be used. Just make sure that you install the Backend before running the application.
 
-The default SQL database that is used is a . You can change it using any argument that Sequel.connect method would accept.
+### Sequel
+
+Gemfile
+
+	gem 'sequel'
+	gem 'sqlite3'
+
+Configuration
+
+	EQ.config.queue = 'sequel'
 	
-	# SQLite3 in-memory (default) using String syntax
-	EQ.config.sequel = 'sqlite:/'
+	# With SQLite3 in-memory (default) using String syntax
+	EQ.config.sequel = 'sqlite:/' 
 	
-	# SQLite3 file using Hash syntax
+	# With SQLite3 file using Hash syntax
 	EQ.config.sequel = {adapter: 'sqlite', database: 'my_db.sqlite3'}
 	
-	# Postgres
+	# With Postgres
 	EQ.config.sequel = 'postgres://user:password@host:port/my_db'
 	
+	# Mysql, Oracle, etc.
+	# ...
+
+# LevelDB
+
+Gemfile
+
+	gem 'leveldb-ruby'
+
+Configuration
+
+	EQ.config.queue = 'leveldb'
+	EQ.config.leveldb = 'path/to/my/queue.leveldb'
 
 ### Logging
 
@@ -62,7 +84,7 @@ EQ uses the logging mechanism of the underlying Celluloid (`Celluloid.logger`) f
 	# Use the logger of your Rails application.
 	Celluloid.logger = Rails.logger
 	
-	# No more logging at all.
+	# No logging at all.
 	Celluloid.logger = Logger.new('/dev/null')
 
 ## Contributing
