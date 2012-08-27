@@ -19,7 +19,7 @@ class BenchmarkHelper < Struct.new(:n, :benchmark)
     n.times { |i| EQ.queue.push! MyJob, i }
     benchmark.report name do
       EQ.boot_working
-      sleep 0.01 until EQ.queue.waiting.count == 0
+      sleep 0.01 until EQ.queue.count(:waiting) == 0
     end  
     EQ.shutdown
     sleep 0.05
@@ -37,10 +37,6 @@ Benchmark.bm(50) do |b|
   helper.report 'file-based-sqlite' do |config|
     config.queue = 'sequel'
     config.sequel = "sqlite://#{Dir.mktmpdir}/benchmark.sqlite3"
-  end
-
-  helper.report 'sorted set' do |config|
-    config.queue = 'sorted_set'
   end
 
   helper.report 'leveldb' do |config|

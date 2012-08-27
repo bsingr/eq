@@ -39,10 +39,6 @@ Benchmark.bm(50) do |b|
     config.sequel = "sqlite://#{Dir.mktmpdir}/benchmark.sqlite3"
   end
 
-  helper.report 'sorted set' do |config|
-    config.queue = 'sorted_set'
-  end
-
   helper.report 'leveldb' do |config|
     config.queue = 'leveldb'
     config.leveldb = Dir.mktmpdir
