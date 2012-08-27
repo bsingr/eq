@@ -17,14 +17,16 @@ Gem::Specification.new do |gem|
 
   gem.add_dependency "celluloid"
 
+  # just to test the backends
+
   # sequel backend
-  gem.add_dependency "sequel"
+  gem.add_development_dependency "sequel"
 
   # sequel with sqlite
-  gem.add_dependency "sqlite3"
+  gem.add_development_dependency "sqlite3"
 
   # leveldb backend
-  gem.add_dependency "leveldb-ruby"
+  gem.add_development_dependency "leveldb-ruby"
 
   gem.add_development_dependency "guard"
   gem.add_development_dependency "guard-rspec"

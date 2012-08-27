@@ -5,8 +5,10 @@ require File.join(File.dirname(__FILE__), 'eq-queueing', 'queue')
 module EQ::Queueing
   module_function
 
+  EQ_QUEUE = :_eq_queueing
+
   def boot
-    EQ::Queueing::Queue.supervise_as :_eq_queueing, initialize_queueing_backend
+    EQ::Queueing::Queue.supervise_as EQ_QUEUE, EQ::Queueing::Backends.init(EQ.config)
   end
 
   def shutdown
@@ -14,19 +16,6 @@ module EQ::Queueing
   end
 
   def queue
-    Celluloid::Actor[:_eq_queueing]
-  end
-
-  # @raise ConfigurationError when EQ.config.queue is not supported
-  def initialize_queueing_backend
-    queue_config = EQ.config.send(EQ.config.queue)
-    case EQ.config.queue
-    when 'sequel'
-      EQ::Queueing::Backends::Sequel.new queue_config
-    when 'leveldb'
-      EQ::Queueing::Backends::LevelDB.new queue_config
-    else
-      raise EQ::ConfigurationError, "EQ.config.queue = '#{EQ.config.queue}' is not supported!"
-    end
+    Celluloid::Actor[EQ_QUEUE]
   end
 end
