@@ -1,23 +1,20 @@
 require File.join(File.dirname(__FILE__), 'eq')
 require File.join(File.dirname(__FILE__), 'eq-working', 'worker')
-require File.join(File.dirname(__FILE__), 'eq-working', 'system')
 
 module EQ::Working
   module_function
 
+  EQ_WORKER = :_eq_working
+
   def boot
-    Celluloid::Actor[:_eq_working] = EQ::Working::System.run!
+    Celluloid::Actor[EQ_WORKER] = EQ::Working::Worker.pool
   end
 
   def shutdown
-    worker.finalize! if worker
+    worker.terminate! if worker
   end
 
   def worker
-    Celluloid::Actor[:_eq_working]
-  end
-
-  def worker_pool
-    Celluloid::Actor[:_eq_working_pool]
+    Celluloid::Actor[EQ_WORKER]
   end
 end
