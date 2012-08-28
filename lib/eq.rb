@@ -20,7 +20,7 @@ module EQ
     job_timeout: 5 # in seconds
   }.freeze
 
-  module_function
+module_function
 
   def config
     @config ||= OpenStruct.new DEFAULT_CONFIG
@@ -31,27 +31,11 @@ module EQ
   # this boots queuing and working
   # optional: to use another queuing or working subsystem just do
   # require 'eq/working' or require 'eq/queueing' instead of require 'eq/all'
-  def boot
-    boot_queueing if defined? EQ::Queueing
-    boot_working if defined? EQ::Working
-  end
+  def boot just=nil; manage :boot, just; end
+  def shutdown just=nil; manage :shutdown, just; end
 
-  def shutdown
-    EQ::Working.shutdown if defined? EQ::Working
-    EQ::Queueing.shutdown if defined? EQ::Queueing
-  end
-
-  def boot_queueing
-    EQ::Queueing.boot
-  end
-
-  def boot_working
-    EQ::Working.boot
-  end
-
-  def queue
-    EQ::Queueing.queue
-  end
+  def queue; EQ::Queueing.queue if queueing_loaded?; end
+  def worker; EQ::Working.worker if working_loaded?; end
 
   # queue methods
   %w[ jobs waiting working
@@ -59,20 +43,23 @@ module EQ
     def_delegator :queue, method_name
   end
 
-  def worker
-    EQ::Working.worker
+  def alive?
+    alive = false
+    alive &= queue.alive? if queue
+    alive &= worker.alive? if worker
+    alive
   end
 
+  def logger; Celluloid.logger; end
 
-  def queueing?
-    queue.alive?
-  end
-
-  def working?
-    worker.alive?
-  end
-
-  def logger
-    Celluloid.logger
+  def queueing_loaded?; defined? EQ::Queueing; end
+  def working_loaded?; defined? EQ::Working; end
+  
+  # @param [#to_s] action is the method name to execute on all parts
+  # @param [#to_s] specify just to execute the action on one part
+  def manage action, just=nil
+    what = just ? just.to_s : "queue work"
+    EQ::Queueing.send(action) if what =~ /queue/ && queueing_loaded?
+    EQ::Working.send(action) if what =~ /work/ && working_loaded?
   end
 end

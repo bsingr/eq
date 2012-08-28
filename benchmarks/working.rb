@@ -15,10 +15,10 @@ end
 class BenchmarkHelper < Struct.new(:n, :benchmark)
   def report name, &configure
     EQ.config &configure
-    EQ.boot
-    n.times { |i| EQ.queue.push! MyJob, i }
+    EQ.boot :queue
+    n.times { |i| EQ.queue.push MyJob, i }
     benchmark.report name do
-      EQ.boot_working
+      EQ.boot :worker
       sleep 0.01 until EQ.queue.count(:waiting) == 0
     end  
     EQ.shutdown
