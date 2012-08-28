@@ -9,8 +9,6 @@ module EQ::Queueing
 
     include Celluloid
     include EQ::Logging
-
-    attr_reader :queue
     
     # @param [Object] queue_backend
     def initialize queue_backend
@@ -48,5 +46,9 @@ module EQ::Queueing
     def working; queue.working; end
     def waiting; queue.waiting; end
     def count name=nil; queue.count name; end
+
+  private
+
+    def queue; @queue; end
   end
 end
