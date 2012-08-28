@@ -83,7 +83,7 @@ module EQ::Queueing::Backends
         loop do
           job_id = generate_id
           return job_id unless db.contains? "#{PAYLOAD}:#{job_id}"
-          log_error "#{job_id} is not free"
+          debug "#{job_id} is not free"
         end
       end
 
