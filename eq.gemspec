@@ -16,6 +16,8 @@ Gem::Specification.new do |gem|
   gem.version       = EQ::VERSION
 
   gem.add_dependency "celluloid"
+  
+  gem.add_development_dependency "clockwork"
 
   # just to test the backends
 

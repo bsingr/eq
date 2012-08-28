@@ -36,6 +36,7 @@ module_function
 
   def queue; EQ::Queueing.queue if queueing_loaded?; end
   def worker; EQ::Working.worker if working_loaded?; end
+  def scheduler; EQ::Scheduling.scheduler if scheduling_loaded?; end
 
   # queue methods
   %w[ jobs waiting working
@@ -56,12 +57,14 @@ module_function
 
   def queueing_loaded?; defined? EQ::Queueing; end
   def working_loaded?; defined? EQ::Working; end
+  def scheduling_loaded?; defined? EQ::Scheduling; end
   
   # @param [#to_s] action is the method name to execute on all parts
   # @param [#to_s] specify just to execute the action on one part
   def manage action, just=nil
-    what = just ? just.to_s : "queue work"
+    what = just ? just.to_s : "queue work schedul"
     EQ::Queueing.send(action) if what =~ /queue/ && queueing_loaded?
     EQ::Working.send(action) if what =~ /work/ && working_loaded?
+    EQ::Scheduling.send(action) if what =~ /schedu/ && working_loaded?
   end
 end
