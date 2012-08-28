@@ -1,21 +1,16 @@
 #!/usr/bin/env ruby
 
-require File.join(File.dirname(__FILE__), '..', 'lib', 'eq', 'boot', 'queueing')
-
-require 'benchmark'
-require 'tmpdir'
-
-EQ.logger.level = Logger::Severity::ERROR
+require File.join(File.dirname(__FILE__), 'queue_backend_benchmark')
 
 class MyJob
   def self.perform stuff
   end
 end
 
-class BenchmarkHelper < Struct.new(:n, :benchmark)
+class Executor < Struct.new(:n, :benchmark)
   def report name, &configure
     EQ.config &configure
-    EQ.boot
+    EQ.boot :queue
     benchmark.report name do
       n.times { |i| EQ.queue.push! MyJob, i }
       EQ.queue.count
@@ -25,21 +20,4 @@ class BenchmarkHelper < Struct.new(:n, :benchmark)
   end
 end
 
-n = 500
-Benchmark.bm(50) do |b|
-  helper = BenchmarkHelper.new(n, b)
-
-  helper.report 'sequel with sqlite3 (in-memory)' do |config|
-    config.queue = 'sequel'
-  end
-
-  helper.report 'sequel with sqlite3 (file)' do |config|
-    config.queue = 'sequel'
-    config.sequel = "sqlite://#{Dir.mktmpdir}/benchmark.sqlite3"
-  end
-
-  helper.report 'leveldb' do |config|
-    config.queue = 'leveldb'
-    config.leveldb = Dir.mktmpdir
-  end
-end
+QueueBackendBenchmark.new(Executor.new(1000)).run
