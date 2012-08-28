@@ -39,7 +39,9 @@ module_function
 
   # queue methods
   %w[ jobs waiting working
-      push reserve pop].each do |method_name|
+      push reserve pop
+      push! pop!
+      count ].each do |method_name|
     def_delegator :queue, method_name
   end
 

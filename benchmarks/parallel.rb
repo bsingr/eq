@@ -12,8 +12,8 @@ class Executor < Struct.new(:n, :benchmark)
     EQ.config &configure
     EQ.boot
     benchmark.report name do
-      n.times { |i| EQ.queue.push MyJob, i }
-      sleep 0.01 until EQ.queue.count(:waiting) == 0
+      n.times { |i| EQ.push MyJob, i }
+      sleep 0.01 until EQ.count(:waiting) == 0
     end  
     EQ.shutdown
     sleep 0.05

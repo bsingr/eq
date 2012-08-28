@@ -11,10 +11,10 @@ class Executor < Struct.new(:n, :benchmark)
   def report name, &configure
     EQ.config &configure
     EQ.boot :queue
-    n.times { |i| EQ.queue.push MyJob, i }
+    n.times { |i| EQ.push MyJob, i }
     benchmark.report name do
       EQ.boot :worker
-      sleep 0.01 until EQ.queue.count(:waiting) == 0
+      sleep 0.01 until EQ.count(:waiting) == 0
     end  
     EQ.shutdown
     sleep 0.05
