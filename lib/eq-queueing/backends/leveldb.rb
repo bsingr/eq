@@ -22,9 +22,12 @@ module EQ::Queueing::Backends
       end
 
       def first_waiting
-        if raw = db.each{|k,v| break [k,v] if k.include?(STARTED_WORKING_AT) && v == NOT_WORKING}
-          job_id_from_key(raw.first)
+        db.each do |k,v|
+          if k.include?(STARTED_WORKING_AT) && v == NOT_WORKING
+            return job_id_from_key(k)
+          end
         end
+        nil
       end
 
       def working_iterator
@@ -79,8 +82,7 @@ module EQ::Queueing::Backends
       def find_free_job_id
         loop do
           job_id = generate_id
-          break job_id unless db.contains? "#{PAYLOAD}:#{job_id}"
-          sleep 0.05
+          return job_id unless db.contains? "#{PAYLOAD}:#{job_id}"
           log_error "#{job_id} is not free"
         end
       end

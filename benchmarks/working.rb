@@ -26,7 +26,7 @@ class BenchmarkHelper < Struct.new(:n, :benchmark)
   end
 end
 
-n = 100
+n = 1000
 Benchmark.bm(50) do |b|
   helper = BenchmarkHelper.new(n, b)
 
