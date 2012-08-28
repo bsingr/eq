@@ -1,5 +1,7 @@
 require 'spec_helper'
 
+EQ::Queueing::Backends.require_queue 'leveldb'
+
 describe EQ::Queueing::Backends::LevelDB do
   subject do
     FileUtils.rm_rf 'tmp/rspec/queue.leveldb'

@@ -1,5 +1,7 @@
 require 'spec_helper'
 
+EQ::Queueing::Backends.require_queue 'sequel'
+
 describe EQ::Queueing::Backends::Sequel do
   subject { EQ::Queueing::Backends::Sequel.new 'sqlite:/' }
   it_behaves_like 'abstract queue'
