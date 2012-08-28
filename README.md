@@ -2,7 +2,7 @@
 
 # EQ - Embedded Queueing
 
-EQ is a little framework to queue tasks within a process.
+EQ is a little framework to queue and perform background tasks within a single-process ruby application. It uses the Celluloid actor framework to do the work in the background. Its queue backends persist your jobs. So your jobs will survive application stop/restart. 
 
 [![Travis-CI Build Status](https://secure.travis-ci.org/dpree/eq.png)](https://secure.travis-ci.org/dpree/eq)
 [![Code Climate](https://codeclimate.com/badge.png)](https://codeclimate.com/github/dpree/eq)
@@ -31,11 +31,21 @@ If you want to execute a simple example you can just run [examples/simple_usage.
 
 	EQ.boot
 	
-**3. Let EQ do some work you.**
+**3. Enqueue some jobs in the EQ queue.**
 
 	EQ.push MyJob, 'foo'
 	EQ.push MyJob, 'bar'
 	…	
+
+**5. Let EQ do your work.**
+
+	# EQ will spawn and maintain worker threads that execute the following for you:
+	MyJob.perform 'foo'
+	MyJob.perform 'bar'
+
+**6. Shutdown EQ gracefully when you're application is done.***
+
+	EQ.shutdown
 
 ## Configuration
 
@@ -53,6 +63,7 @@ Configuration
 	EQ.config.queue = 'sequel'
 	
 	# With SQLite3 in-memory (default) using String syntax
+	# Caution: This won't persist your jobs!
 	EQ.config.sequel = 'sqlite:/' 
 	
 	# With SQLite3 file using Hash syntax
