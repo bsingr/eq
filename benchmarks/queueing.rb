@@ -5,8 +5,7 @@ require File.join(File.dirname(__FILE__), '..', 'lib', 'eq', 'boot', 'queueing')
 require 'benchmark'
 require 'tmpdir'
 
-Celluloid.logger = Logger.new('/dev/null')
-#EQ.logger.level = Logger::Severity::ERROR
+EQ.logger.level = Logger::Severity::ERROR
 
 class MyJob
   def self.perform stuff
@@ -30,11 +29,11 @@ n = 500
 Benchmark.bm(50) do |b|
   helper = BenchmarkHelper.new(n, b)
 
-  helper.report 'memory-based sqlite' do |config|
+  helper.report 'sequel with sqlite3 (in-memory)' do |config|
     config.queue = 'sequel'
   end
 
-  helper.report 'file-based-sqlite' do |config|
+  helper.report 'sequel with sqlite3 (file)' do |config|
     config.queue = 'sequel'
     config.sequel = "sqlite://#{Dir.mktmpdir}/benchmark.sqlite3"
   end
