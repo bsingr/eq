@@ -16,19 +16,14 @@ Gem::Specification.new do |gem|
   gem.version       = EQ::VERSION
 
   gem.add_dependency "celluloid"
-  
+
+  # just to test the scheduling  
   gem.add_development_dependency "clockwork"
 
-  # just to test the backends
-
-  # sequel backend
-  gem.add_development_dependency "sequel"
-
-  # sequel with sqlite
-  gem.add_development_dependency "sqlite3"
-
-  # leveldb backend
-  gem.add_development_dependency "leveldb-ruby"
+  # just to test the queueing backends
+  gem.add_development_dependency "sequel"       # sequel backend
+  gem.add_development_dependency "sqlite3"      # sequel with sqlite
+  gem.add_development_dependency "leveldb-ruby" # leveldb backend
 
   gem.add_development_dependency "guard"
   gem.add_development_dependency "guard-rspec"
