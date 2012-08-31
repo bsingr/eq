@@ -47,6 +47,13 @@ If you want to execute a simple example you can just run [examples/simple_usage.
 
 	EQ.shutdown
 
+### Optional: Schedule jobs using Clockwork
+
+	module Clockwork
+	  every(5.seconds, MyJob)
+	  every(1.day, MyJob, :at => '00:00')
+	end
+
 ## Configuration
 
 Right now there are two queueing backends available, one that is based on the Sequel gem and one based on LevelDB. With Sequel basically any SQL database might be used. Just make sure that you install the Backend before running the application.
