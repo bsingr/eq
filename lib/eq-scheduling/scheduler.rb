@@ -1,19 +1,26 @@
 require 'clockwork'
 
+module Clockwork
+  handler do |job|
+    EQ.push job if EQ.queue
+  end
+end
+
 module EQ::Scheduling
   class Scheduler
+    include EQ::Logging
     include Celluloid
-    extend Clockwork
-
-    handler do |job|
-      EQ.push job if EQ.queue
-    end
 
     def initialize config
+      clockwork!
+    end
+
+    def clockwork
+      debug 'scheduler running'
       loop do
         Clockwork.tick
         sleep(Clockwork.config[:sleep_timeout])
-        break unless Actor.current.alive?
+        return unless Actor.current.alive?
       end
     end
   end
