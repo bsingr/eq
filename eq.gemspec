@@ -17,6 +17,9 @@ Gem::Specification.new do |gem|
 
   gem.add_dependency "celluloid"
 
+  # just to test the web view
+  gem.add_development_dependency "sinatra"
+
   # just to test the scheduling  
   gem.add_development_dependency "clockwork"
 

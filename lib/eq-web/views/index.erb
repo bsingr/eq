@@ -1,0 +1,33 @@
+<% if EQ.worker && EQ.worker.alive? %>
+  <h2><%= Celluloid.cores %> Worker</h2>
+<% else %>
+  <h2>Worker deaktiviert</h2>
+<% end %>
+<% if EQ.scheduler && EQ.scheduler.alive? %>
+  <h2>Scheduler</h2>
+  <table>
+    <% Clockwork.class_variable_get('@@events').each do |event| %>
+      <tr>
+        <td><%= event.job %></td>
+        <td><%= event.instance_variable_get('@period') %></td>
+      </tr>
+    <% end %>
+  </table>
+<% else %>
+  <h2>Scheduler deaktiviert</h2>
+<% end %>
+<% if EQ.queue && EQ.queue.alive? %>
+  <h2><%= EQ.queue.count %> Queue Jobs</h2>
+  <table>
+    <% EQ.queue.jobs.all.each do |job| %>
+      <tr>
+        <td><%= job[:id] %></td>
+        <td><%= job[:payload] %></td>
+        <td><%= job[:created_at] %></td>
+        <td><%= job[:started_working_at] %></td>
+      </tr>
+    <% end %>
+  </table>
+<% else %>
+  <h2>Queue deaktiviert</h2>
+<% end %>
