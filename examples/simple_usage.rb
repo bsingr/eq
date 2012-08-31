@@ -23,15 +23,25 @@ end
 # Cleanup results file.
 File.delete MyJob::RESULT_PATH if File.exists? MyJob::RESULT_PATH
 
-# Start the EQ system.
-EQ.boot
+EQ.config do |c|
+  c.sequel = 'sqlite://examples/foo'
+end
 
-# Enqueue some work.
-EQ.queue.push! MyJob, Time.now, 1
-EQ.queue.push! MyJob, Time.now, 2
+require 'timeout'
+begin
+  Timeout.timeout(12) do
 
-# Wait some time to get the work done.
-sleep 3
+    # Start the EQ system.
+    EQ.boot
+
+    # Enqueue some work.
+    EQ.queue.push! MyJob, Time.now, 0.1
+    EQ.queue.push! MyJob, Time.now, 0.5
+
+    # Wait some time to get the work done.
+    sleep 1
+  end
+end
 
 # Read the results file.
-puts File.read MyJob::RESULT_PATH
+puts File.read(MyJob::RESULT_PATH)
