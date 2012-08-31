@@ -34,7 +34,7 @@ module EQ::Queueing::Backends
     # @return [Array<Fixnum, String>] job data consisting of id and payload
     def reserve
       db.transaction do
-        if job = waiting.order(:id.asc).limit(1).first
+        if job = waiting.order(:id).last # asc
           job[:started_working_at] = Time.now
           update_job!(job)
           [job[:id], job[:payload]]
