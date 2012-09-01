@@ -208,6 +208,10 @@ module EQ::Queueing::Backends
       requeued
     end
 
+    def clear
+      db.each{|k,v| db.delete k}
+    end
+
     def count name=nil
       case name
       when :waiting

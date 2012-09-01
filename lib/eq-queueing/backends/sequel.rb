@@ -109,6 +109,10 @@ module EQ::Queueing::Backends
       end
     end
 
+    def clear
+      jobs.delete
+    end
+
     def iterator
       jobs.each do |job|
         job[:payload] = Marshal.load(job[:payload]) if job[:payload]

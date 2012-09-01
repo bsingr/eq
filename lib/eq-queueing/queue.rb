@@ -49,6 +49,10 @@ module EQ::Queueing
       queue.iterator &block
     end
 
+    def clear
+      queue.clear
+    end
+
   private
 
     def queue; @queue; end

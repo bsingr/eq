@@ -9,6 +9,10 @@ module EQ::Web
       erb :index
     end
 
+    get '/delete' do
+      EQ.queue.clear
+    end
+
     get '/delete/:id' do
       EQ.queue.pop(params[:id])
       redirect url_path

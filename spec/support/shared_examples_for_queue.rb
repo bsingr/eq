@@ -39,6 +39,13 @@ shared_examples_for 'queue backend' do
     subject.pop(1).should be_false # again no job"
   end
 
+  it 'clears jobs' do
+    10.times { subject.push(eq_job) }
+    subject.count.should == 10
+    subject.clear
+    subject.count.should == 0
+  end
+
   it 'puts working job back on waiting when they timeout via #requeue_timed_out_jobs' do
     # freeze time on start of 1986
     Timecop.freeze(Time.new(1986)) do

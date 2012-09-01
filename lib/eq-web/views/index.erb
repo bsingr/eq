@@ -17,7 +17,7 @@
   <h2>Scheduler deaktiviert</h2>
 <% end %>
 <% if EQ.queue && EQ.queue.alive? %>
-  <h2><%= EQ.queue.count %> Queue Jobs</h2>
+  <h2><%= EQ.queue.count %> Queue Jobs (<a href='<%=u "/delete" %>'>Remove all</a>)</h2>
   <table>
     <thead>
       <tr>
