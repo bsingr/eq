@@ -8,5 +8,28 @@ module EQ::Web
     get '/' do
       erb :index
     end
+
+    get '/delete/:id' do
+      EQ.queue.pop(params[:id])
+      redirect url_path
+    end
+
+    helpers do
+      include Rack::Utils
+      alias_method :h, :escape_html
+
+      def current_page
+        url_path request.path_info.sub('/','')
+      end
+
+      def url_path(*path_parts)
+        [ path_prefix, path_parts ].join("/").squeeze('/')
+      end
+      alias_method :u, :url_path
+
+      def path_prefix
+        request.env['SCRIPT_NAME']
+      end
+    end
   end
 end
