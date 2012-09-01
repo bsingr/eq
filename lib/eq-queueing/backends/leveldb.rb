@@ -14,9 +14,10 @@ module EQ::Queueing::Backends
       STARTED_WORKING_AT = 'started_working_at'.freeze
       NOT_WORKING = ''.freeze
 
+      # @param [EQ::Job] job
       def push job
         job_id = find_free_job_id
-        db["#{QUEUE}:#{job_id}"] = job.queue_str
+        db["#{QUEUE}:#{job_id}"] = job.queue
         db["#{PAYLOAD}:#{job_id}"] = serialize(job.payload) unless job.payload.nil?
         db["#{CREATED_AT}:#{job_id}"] = serialize(Time.now)
         db["#{STARTED_WORKING_AT}:#{job_id}"] = NOT_WORKING

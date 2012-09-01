@@ -9,6 +9,7 @@ require 'fileutils'
 
 require File.join(File.dirname(__FILE__), '..', 'lib', 'eq', 'boot', 'all')
 Dir[File.join(File.dirname(__FILE__), '/support/**/*.rb')].each {|f| require f; puts f}
+Dir[File.join(File.dirname(__FILE__), '/mocks/**/*.rb')].each {|f| require f; puts f}
 
 Celluloid.logger = Logger.new(File.join(File.dirname(__FILE__), '..', 'log', 'rspec.log'))
 

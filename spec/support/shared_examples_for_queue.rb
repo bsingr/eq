@@ -1,14 +1,5 @@
 shared_examples_for 'queue backend' do
-  it 'pushes and pops' do
-    job = EQ::Job.new(nil, 'foo', 'bar')
-    job_id = subject.push job
-    job = subject.reserve
-    job.id.should == job_id
-  end
-end
-
-shared_examples_for 'abstract queue' do
-  let(:eq_job) { EQ::Job.new(nil, 'foo') }
+  let(:eq_job) { EQ::Job.new(nil, AJob, 'foo') }
 
   it 'has no jobs at the beginning' do
     subject.count(:jobs).should == 0
@@ -28,7 +19,8 @@ shared_examples_for 'abstract queue' do
     subject.count(:jobs).should == 1
     subject.count(:waiting).should == 1
     subject.count(:working).should == 0
-    subject.reserve
+    job = subject.reserve
+    id.should == job.id
     subject.count(:jobs).should == 1
     subject.count(:waiting).should == 0
     subject.count(:working).should == 1
@@ -67,7 +59,6 @@ shared_examples_for 'abstract queue' do
       # no on working after senseless re-enqueueing
       subject.count(:waiting).should == 0
       subject.count(:working).should == 1
-
     end
 
     # freeze the time to 10s in the future

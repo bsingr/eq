@@ -5,16 +5,16 @@ describe EQ::Job do
   it 'creates a job with payload' do
     job = EQ::Job.new nil, EQ::Job, ['bar', 'foo']
     job.id.should == nil
-    job.queue.should == EQ::Job
-    job.queue_str.should == "EQ::Job"
+    job.queue.should == "EQ::Job"
+    job.job_class.should == EQ::Job
     job.payload.should == ['bar', 'foo']
   end
 
   it 'creates a job without payload' do
     job = EQ::Job.new nil, EQ::Job
     job.id.should == nil
-    job.queue.should == EQ::Job
-    job.queue_str.should == "EQ::Job"
+    job.queue.should == "EQ::Job"
+    job.job_class.should == EQ::Job
     job.payload.should == nil
   end
 

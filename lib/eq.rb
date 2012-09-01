@@ -6,6 +6,7 @@ require 'forwardable'
 require 'celluloid'
 
 require File.join(File.dirname(__FILE__), 'eq', 'version')
+require File.join(File.dirname(__FILE__), 'eq', 'error')
 require File.join(File.dirname(__FILE__), 'eq', 'logging')
 require File.join(File.dirname(__FILE__), 'eq', 'job')
 

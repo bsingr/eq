@@ -6,7 +6,7 @@ describe EQ do
       # setup a in-memory queue backend
       EQ.config {|c| c.queue = 'sequel'; c.sequel = 'sqlite:/'}
       EQ.boot
-      EQ.queue.push 'foo'
+      EQ.queue.push AJob
       EQ.queue.count.should == 1
       EQ.shutdown
       EQ.boot

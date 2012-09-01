@@ -4,7 +4,6 @@ EQ::Queueing::Backends.require_queue 'sequel'
 
 describe EQ::Queueing::Backends::Sequel do
   subject { EQ::Queueing::Backends::Sequel.new 'sqlite:/' }
-  it_behaves_like 'abstract queue'
   it_behaves_like 'queue backend'
 
   it 'handles ::Sequel::DatabaseError with retry' do
@@ -19,7 +18,7 @@ describe EQ::Queueing::Backends::Sequel do
       end
     end
     subject.count(:waiting).should == 0
-    subject.push EQ::Job.new(nil, 'foo')
+    subject.push EQ::Job.new(nil, AJob)
     subject.count(:waiting).should == 1
   end
 end

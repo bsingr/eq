@@ -22,7 +22,7 @@ module EQ::Queueing::Backends
     # @param [EQ::Job] payload
     # @return [Fixnum] id of the job
     def push eq_job
-      job = {queue: eq_job.queue_str, created_at: Time.now}
+      job = {queue: eq_job.queue, created_at: Time.now}
       job[:payload] = Marshal.dump(eq_job.payload).to_sequel_blob unless eq_job.payload.nil?
       jobs.insert job
     rescue ::Sequel::DatabaseError => e

@@ -1,28 +1,23 @@
 module EQ
   class Job
-    attr_reader :id, :payload
+    class UnknownJobClassError < EQ::Error; end
+    attr_reader :id, :queue, :payload
 
     def initialize id, queue, payload=nil
       @id = id
-      @queue = queue
+      @queue = queue.to_s
       @payload = payload
-    end
-
-    def queue
-      if @queue.is_a? String
-        @queue.split("::").inject(Kernel){|constant,part| constant.const_get(part)}
-      else
-        @queue
-      end
-    end
-
-    def queue_str
-      @queue.to_s
     end
 
     # calls MyJobClass.perform(*payload)
     def perform
-      queue.perform *payload
+      job_class.perform *payload
+    end
+
+    def job_class
+      queue.split("::").inject(Kernel){|constant,part| constant.const_get(part)}
+    rescue NameError => e
+      raise UnknownJobClassError, e.to_s
     end
   end
 end
