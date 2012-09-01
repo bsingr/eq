@@ -45,6 +45,10 @@ module EQ::Queueing
     def waiting; queue.waiting; end
     def count name=nil; queue.count name; end
 
+    def iterator &block
+      queue.iterator &block
+    end
+
   private
 
     def queue; @queue; end

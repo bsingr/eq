@@ -152,6 +152,20 @@ module EQ::Queueing::Backends
         end
         result
       end
+
+      def each
+        # TODO optimize this (and others) using range queries
+        db.each do |k,v|
+          if k.include?(QUEUE)
+            job_id = job_id_from_key(k)
+            yield(id: job_id,
+                  queue: v,
+                  payload: find_payload(job_id),
+                  created_at: find_created_at(job_id),
+                  started_working_at: find_started_working_at(job_id))
+          end
+        end
+      end
     end
 
     attr_reader :db
@@ -202,6 +216,12 @@ module EQ::Queueing::Backends
         jobs.count_working
       else
         jobs.count
+      end
+    end
+
+    def iterator
+      jobs.each do |job|
+        yield job
       end
     end
   end

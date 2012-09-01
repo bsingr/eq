@@ -109,6 +109,13 @@ module EQ::Queueing::Backends
       end
     end
 
+    def iterator
+      jobs.each do |job|
+        job[:payload] = Marshal.load(job[:payload]) if job[:payload]
+        yield job
+      end
+    end
+
   private
 
     # connects to the given database config

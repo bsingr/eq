@@ -17,4 +17,8 @@ module EQ::Working
   def worker
     Celluloid::Actor[EQ_WORKER]
   end
+
+  def pool_size
+    Celluloid.cores
+  end
 end

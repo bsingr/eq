@@ -1,11 +1,3 @@
-require 'clockwork'
-
-module Clockwork
-  handler do |job|
-    EQ.push job if EQ.queue
-  end
-end
-
 module EQ::Scheduling
   class Scheduler
     include EQ::Logging
