@@ -5,11 +5,11 @@ describe EQ do
     it "won't survives at least a dying queue actor" do
       # setup a in-memory queue backend
       EQ.config {|c| c.queue = 'sequel'; c.sequel = 'sqlite:/'}
-      EQ.boot
+      EQ.boot :queue
       EQ.queue.push AJob
       EQ.queue.count.should == 1
       EQ.shutdown
-      EQ.boot
+      EQ.boot :queue
       EQ.queue.count.should == 0
     end
   end
