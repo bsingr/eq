@@ -1,13 +1,15 @@
 shared_examples_for 'queue backend' do
   it 'pushes and pops' do
-    subject.push "foo"
-    job_id, payload = *subject.reserve
-    job_id.should_not be_nil
-    payload.should == "foo"
+    job = EQ::Job.new(nil, 'foo', 'bar')
+    job_id = subject.push job
+    job = subject.reserve
+    job.id.should == job_id
   end
 end
 
 shared_examples_for 'abstract queue' do
+  let(:eq_job) { EQ::Job.new(nil, 'foo') }
+
   it 'has no jobs at the beginning' do
     subject.count(:jobs).should == 0
     subject.count(:waiting).should == 0
@@ -15,14 +17,14 @@ shared_examples_for 'abstract queue' do
   end
 
   it 'pushes jobs' do
-    subject.push("foo").should_not be_nil # job_id
+    subject.push(eq_job).should_not be_nil # job_id
     subject.count(:jobs).should == 1
     subject.count(:waiting).should == 1
     subject.count(:working).should == 0
   end
 
   it 'reserves jobs' do
-    id = subject.push "foo"
+    id = subject.push eq_job
     subject.count(:jobs).should == 1
     subject.count(:waiting).should == 1
     subject.count(:working).should == 0
@@ -34,7 +36,7 @@ shared_examples_for 'abstract queue' do
 
   it 'pops jobs' do
     subject.pop(1).should be_false # no job
-    job_id = subject.push "foo"
+    job_id = subject.push eq_job
     subject.count(:jobs).should == 1
     subject.count(:waiting).should == 1
     subject.count(:working).should == 0
@@ -50,7 +52,7 @@ shared_examples_for 'abstract queue' do
     Timecop.freeze(Time.new(1986)) do
     
       # create a job
-      id = subject.push "foo"
+      id = subject.push eq_job
 
       # start working
       data = subject.reserve

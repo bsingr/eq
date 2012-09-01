@@ -1,25 +1,28 @@
 module EQ
-  class Job < Struct.new(:id, :serialized_payload)
-    class << self
-      def dump *unserialized_payload
-        Marshal.dump(unserialized_payload.flatten)
-      end
+  class Job
+    attr_reader :id, :payload
 
-      def load id, serialized_payload
-        Job.new id, serialized_payload
+    def initialize id, queue, payload=nil
+      @id = id
+      @queue = queue
+      @payload = payload
+    end
+
+    def queue
+      if @queue.is_a? String
+        @queue.split("::").inject(Kernel){|constant,part| constant.const_get(part)}
+      else
+        @queue
       end
     end
 
-    # unmarshals the serialized_payload
-    def unpack
-      #[const_name.split("::").inject(Kernel){|res,current| res.const_get(current)}, *payload]
-      Marshal.load(serialized_payload)
+    def queue_str
+      @queue.to_s
     end
 
     # calls MyJobClass.perform(*payload)
     def perform
-      const, *payload = unpack
-      const.perform *payload
+      queue.perform *payload
     end
   end
 end

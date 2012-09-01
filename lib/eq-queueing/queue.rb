@@ -17,17 +17,15 @@ module EQ::Queueing
 
     # @param [Array<Class, *payload>] unserialized_payload
     # @return [Fixnum] job_id 
-    def push *unserialized_payload
-      debug "enqueing #{unserialized_payload.inspect} ..."
-      queue.push EQ::Job.dump(unserialized_payload)
+    def push job_class, *job_payload
+      debug "enqueing #{job_payload.inspect} ..."
+      queue.push EQ::Job.new(nil, job_class, job_payload)
     end
 
     # @return [EQ::Job, nilClass] job instance
     def reserve
       requeue_timed_out_jobs
-      if serialized_job = queue.reserve
-        job_id, serialized_payload = *serialized_job
-        job = EQ::Job.load job_id, serialized_payload
+      if job = queue.reserve
         debug "dequeud #{job.inspect}"
         job
       end

@@ -19,10 +19,12 @@ module EQ::Queueing::Backends
       create_table_if_not_exists!
     end
 
-    # @param [#to_sequel_block] payload
+    # @param [EQ::Job] payload
     # @return [Fixnum] id of the job
-    def push payload
-      jobs.insert payload: payload.to_sequel_blob, created_at: Time.now
+    def push eq_job
+      job = {queue: eq_job.queue_str, created_at: Time.now}
+      job[:payload] = Marshal.dump(eq_job.payload).to_sequel_blob unless eq_job.payload.nil?
+      jobs.insert job
     rescue ::Sequel::DatabaseError => e
       retry if on_error e
     end
@@ -37,7 +39,8 @@ module EQ::Queueing::Backends
         if job = waiting.order(:id).last # asc
           job[:started_working_at] = Time.now
           update_job!(job)
-          [job[:id], job[:payload]]
+          payload = job[:payload].nil? ? nil : Marshal.load(job[:payload])
+          EQ::Job.new(job[:id], job[:queue], payload)
         end
       end
     rescue ::Sequel::DatabaseError => e
@@ -113,6 +116,7 @@ module EQ::Queueing::Backends
     def create_table_if_not_exists!
       db.create_table? TABLE_NAME do
         primary_key :id
+        String :queue
         Timestamp :created_at
         Timestamp :started_working_at
         Blob :payload

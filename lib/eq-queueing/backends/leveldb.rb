@@ -8,15 +8,17 @@ module EQ::Queueing::Backends
     class JobsCollection < Struct.new(:db, :name)
       include EQ::Logging
 
+      QUEUE              = 'queue'.freeze
       PAYLOAD            = 'payload'.freeze
       CREATED_AT         = 'created_at'.freeze
       STARTED_WORKING_AT = 'started_working_at'.freeze
       NOT_WORKING = ''.freeze
 
-      def push payload
+      def push job
         job_id = find_free_job_id
-        db["#{PAYLOAD}:#{job_id}"] = payload
-        db["#{CREATED_AT}:#{job_id}"] = serialize_time(Time.now)
+        db["#{QUEUE}:#{job_id}"] = job.queue_str
+        db["#{PAYLOAD}:#{job_id}"] = serialize(job.payload) unless job.payload.nil?
+        db["#{CREATED_AT}:#{job_id}"] = serialize(Time.now)
         db["#{STARTED_WORKING_AT}:#{job_id}"] = NOT_WORKING
         job_id
       end
@@ -33,43 +35,52 @@ module EQ::Queueing::Backends
       def working_iterator
         db.each do |k,v|
           if k.include?(STARTED_WORKING_AT) && v != NOT_WORKING
-            yield job_id_from_key(k), deserialize_time(v)
+            yield job_id_from_key(k), deserialize(v)
           end
         end
       end
 
       def delete job_id
-        did_exist = !db["#{PAYLOAD}:#{job_id}"].nil?
+        did_exist = !db["#{QUEUE}:#{job_id}"].nil?
         db.batch do |batch|
+          batch.delete "#{QUEUE}:#{job_id}"
           batch.delete "#{PAYLOAD}:#{job_id}"
           batch.delete "#{CREATED_AT}:#{job_id}"
           batch.delete "#{STARTED_WORKING_AT}:#{job_id}"
         end
-        does_not_exist = db["#{PAYLOAD}:#{job_id}"].nil?
+        does_not_exist = db["#{QUEUE}:#{job_id}"].nil?
         did_exist && does_not_exist
       end
 
       def start_working job_id
-        db["#{STARTED_WORKING_AT}:#{job_id}"] = serialize_time(Time.now)
+        db["#{STARTED_WORKING_AT}:#{job_id}"] = serialize(Time.now)
       end
 
       def stop_working job_id
         db["#{STARTED_WORKING_AT}:#{job_id}"] = NOT_WORKING
       end
 
+      def find_queue job_id
+        db["#{QUEUE}:#{job_id}"]
+      end
+
       def find_payload job_id
-        db["#{PAYLOAD}:#{job_id}"]
+        if raw = db["#{PAYLOAD}:#{job_id}"]
+          deserialize db["#{PAYLOAD}:#{job_id}"]
+        else
+          nil
+        end
       end
 
       def find_created_at job_id
         if serialized_time = db["#{CREATED_AT}:#{job_id}"]
-          deserialize_time(serialized_time)
+          deserialize(serialized_time)
         end
       end
 
       def find_started_working_at job_id
         if serialized_time = db["#{STARTED_WORKING_AT}:#{job_id}"]
-          deserialize_time(serialized_time)
+          deserialize(serialized_time)
         end
       end
 
@@ -82,7 +93,7 @@ module EQ::Queueing::Backends
       def find_free_job_id
         loop do
           job_id = generate_id
-          return job_id unless db.contains? "#{PAYLOAD}:#{job_id}"
+          return job_id unless db.contains? "#{QUEUE}:#{job_id}"
           debug "#{job_id} is not free"
         end
       end
@@ -93,18 +104,18 @@ module EQ::Queueing::Backends
         '%d%04d' % [(Time.now.to_f * 1000.0).to_i, Kernel.rand(1000)]
       end
 
-      def serialize_time time
-        Marshal.dump(time)
+      def serialize data
+        Marshal.dump(data)
       end
 
-      def deserialize_time serialized_time
-        Marshal.load(serialized_time)
+      def deserialize data
+        Marshal.load(data)
       end
 
       def count
         result = 0
         db.each do |k,v|
-          result += 1 if k.include?(PAYLOAD)
+          result += 1 if k.include?(QUEUE)
         end
         result
       end
@@ -145,7 +156,7 @@ module EQ::Queueing::Backends
     def reserve
       if job_id = jobs.first_waiting
         jobs.start_working job_id
-        [job_id, jobs.find_payload(job_id)]
+        EQ::Job.new job_id, jobs.find_queue(job_id), jobs.find_payload(job_id)
       end
     end
 

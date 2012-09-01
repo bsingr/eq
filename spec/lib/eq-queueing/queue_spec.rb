@@ -7,14 +7,10 @@ describe EQ::Queueing::Queue do
   end
   it_behaves_like 'abstract queue'
 
-  it 'serializes jobs' do
-    EQ::Job.should_receive(:dump).with(["foo"]).and_return(Marshal.dump(["foo"]))
-    subject.push "foo"
-  end
-
-  it 'deserializes jobs' do
-    job_id = subject.push "foo"
-    EQ::Job.should_receive(:load).with(job_id, Marshal.dump(["foo"]))
-    subject.reserve
+  it 'instantiates EQ::Job' do
+    job = EQ::Job.new(nil, 'foo', ['bar', 'baz'])
+    EQ::Job.stub(:new).and_return(job)
+    EQ::Job.should_receive(:new).with(job.id, job.queue_str, job.payload)
+    subject.push 'foo', 'bar', 'baz'
   end
 end

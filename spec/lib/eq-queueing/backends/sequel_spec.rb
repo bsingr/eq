@@ -19,7 +19,7 @@ describe EQ::Queueing::Backends::Sequel do
       end
     end
     subject.count(:waiting).should == 0
-    subject.push "foo"
+    subject.push EQ::Job.new(nil, 'foo')
     subject.count(:waiting).should == 1
   end
 end
