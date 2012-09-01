@@ -74,7 +74,24 @@ shared_examples_for 'queue backend' do
       # now the old job is available again
       subject.count(:waiting).should == 1
       subject.count(:working).should == 0
+    end
+  end
 
+  context 'unique jobs' do
+    it 'does not enqueue multiple times when args are the same' do
+      subject.count.should == 0
+      id = subject.push EQ::Job.new(nil, AUniqueJob)
+      subject.count.should == 1
+      id = subject.push EQ::Job.new(nil, AUniqueJob)
+      subject.count.should == 1
+    end
+
+    it 'does enqueue multiple times when args differ' do
+      subject.count.should == 0
+      id = subject.push EQ::Job.new(nil, AUniqueJob, 'foo')
+      subject.count.should == 1
+      id = subject.push EQ::Job.new(nil, AUniqueJob, 'bar')
+      subject.count.should == 2
     end
   end
 end

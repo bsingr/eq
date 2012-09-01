@@ -41,6 +41,18 @@ module EQ::Queueing::Backends
         end
       end
 
+      # @param [EQ::Job] job without id
+      def exists? job
+        db.each do |k,v|
+          if k.include?(QUEUE) && v == job.queue
+            if find_payload(job_id_from_key(k)) == job.payload
+              return true
+            end
+          end
+        end
+        false
+      end
+
       def delete job_id
         did_exist = !db["#{QUEUE}:#{job_id}"].nil?
         db.batch do |batch|
@@ -150,8 +162,13 @@ module EQ::Queueing::Backends
       @jobs = JobsCollection.new(db)
     end
 
-    def push payload
-      jobs.push payload
+    # @param [EQ::Job] job
+    def push job
+      if job.unique? && jobs.exists?(job)
+        false
+      else
+        jobs.push job
+      end
     end
 
     def reserve

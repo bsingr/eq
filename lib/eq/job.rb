@@ -19,5 +19,13 @@ module EQ
     rescue NameError => e
       raise UnknownJobClassError, e.to_s
     end
+
+    def unique?
+      config(:unique) == true
+    end
+
+    def config name
+      job_class.instance_variable_get "@#{name}"
+    end
   end
 end

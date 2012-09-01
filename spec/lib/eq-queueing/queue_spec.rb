@@ -15,4 +15,22 @@ describe EQ::Queueing::Queue do
     EQ::Job.should_receive(:new).with(id, job_class, payload)
     subject.push job_class, *payload
   end
+
+  context 'unique jobs' do
+    it 'does not enqueue multiple times when args are the same' do
+      subject.count.should == 0
+      id = subject.push AUniqueJob, "foo"
+      subject.count.should == 1
+      id = subject.push AUniqueJob, "foo"
+      subject.count.should == 1
+    end
+
+    it 'does enqueue multiple times when args differ' do
+      subject.count.should == 0
+      id = subject.push AUniqueJob, "foo"
+      subject.count.should == 1
+      id = subject.push AUniqueJob, "bar"
+      subject.count.should == 2
+    end
+  end
 end
