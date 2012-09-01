@@ -5,10 +5,12 @@ module EQ::Working
 
     def initialize autostart=true
       # start working async
-      run! if autostart
+      process_jobs! if autostart
     end
 
-    def run
+    def process_jobs
+      sleep EQ.config.worker_delay
+
       # TODO check if this is really what we want here, does it stop gracefully?
       while Celluloid::Actor.current.alive?
         if job = look_for_a_job

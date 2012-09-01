@@ -7,7 +7,15 @@ module EQ::Working
   EQ_WORKER = :_eq_working
 
   def boot
-    Celluloid::Actor[EQ_WORKER] = EQ::Working::Worker.pool
+    pool_size =EQ.config.worker_pool_size
+    case pool_size
+    when 0
+      puts "pool empty"
+    when 1
+      EQ::Working::Worker.supervise_as EQ_WORKER
+    else
+      Celluloid::Actor[EQ_WORKER] = EQ::Working::Worker.pool size: pool_size
+    end
   end
 
   def shutdown
@@ -19,6 +27,6 @@ module EQ::Working
   end
 
   def pool_size
-    Celluloid.cores
+    EQ.config.worker_pool_size
   end
 end

@@ -18,7 +18,9 @@ module EQ
   DEFAULT_CONFIG = {
     queue: 'sequel',
     sequel: 'sqlite:/',
-    job_timeout: 5 # in seconds
+    job_timeout: 5, # in seconds
+    worker_pool_size: Celluloid.cores, # in threads
+    worker_delay: 0
   }.freeze
 
 module_function
