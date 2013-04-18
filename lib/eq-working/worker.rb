@@ -40,6 +40,9 @@ module EQ::Working
       debug "processing #{job.inspect}"
       job.perform
       EQ.queue.pop! job.id
+    rescue => e
+      log_error "job threw unhandled exception, will retry later. exception #{e}"
+      raise e
     end
   end
 end

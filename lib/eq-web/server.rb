@@ -18,6 +18,11 @@ module EQ::Web
       redirect url_path
     end
 
+    get '/retry/:id' do
+      EQ.queue.retry(params[:id])
+      redirect url_path
+    end
+
     helpers do
       include Rack::Utils
       alias_method :h, :escape_html

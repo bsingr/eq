@@ -31,7 +31,11 @@
     <tbody>
       <% EQ.queue.iterator do |job| %>
         <tr>
-          <td><%= job[:id] %> (<a href='<%=u "/delete/#{job[:id]}" %>'>Remove</a>)</td>
+          <td>
+            <%= job[:id] %>
+            ( <a href='<%=u "/retry/#{job[:id]}" %>'>Retry</a> | 
+              <a href='<%=u "/delete/#{job[:id]}" %>'>Remove</a> )
+          </td>
           <td><%= job[:queue] %></td>
           <td><%= job[:payload] %></td>
           <td><%= job[:created_at] %></td>
