@@ -1,4 +1,4 @@
-# EXPERIMENTAL FOO, THE DEVILS RIDE...
+# EXPERIMENTAL
 
 # EQ - Embedded Queueing
 
