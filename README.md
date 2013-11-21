@@ -117,3 +117,7 @@ EQ uses the logging mechanism of the underlying Celluloid (`Celluloid.logger`) f
 
 Copyright (c) 2012 Jens Bissinger. See [LICENSE](LICENSE).
 
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/dpree/eq/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
